@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColonyCount</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0f0d;--surface:#111a14;--surface2:#152010;
+  --border:#243328;--accent:#4dff91;--accent-dim:#1a4a2a;
+  --text:#d4f0e0;--muted:#5a8a6a;--danger:#ff6b6b;--warn:#ffd166;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:36px 16px 100px}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(77,255,145,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(77,255,145,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+.wrap{width:100%;max-width:820px;position:relative;z-index:1}
+header{margin-bottom:32px;text-align:center}
+.logo{font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(2rem,5vw,3.2rem);color:var(--accent);letter-spacing:-1px;line-height:1}
+.tagline{font-size:.65rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:22px;margin-bottom:14px}
+.card-title{font-size:.6rem;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.btn{font-family:'Space Mono',monospace;font-weight:700;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;padding:10px 16px;transition:all .2s;border:none;display:inline-block}
+.btn-primary{background:var(--accent);color:#051008}.btn-primary:hover:not(:disabled){opacity:.85}.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--muted)}.btn-outline:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}.btn-outline:disabled{opacity:.35;cursor:not-allowed}
+.btn-sm{padding:6px 11px;font-size:.62rem}
+.btn-warn{background:none;border:1px solid var(--warn);color:var(--warn)}.btn-warn:hover{background:rgba(255,209,102,.08)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row .btn{flex:1;min-width:120px;text-align:center}
+input[type=text],input[type=password],input[type=number]{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'Space Mono',monospace;font-size:.75rem;padding:8px 10px;outline:none;transition:border-color .2s;width:100%}
+input:focus{border-color:var(--accent)}
+input::placeholder{color:var(--muted);opacity:.5}
+.drop-zone{border:2px dashed var(--border);border-radius:4px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(77,255,145,.04)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:2rem;margin-bottom:8px;display:block}
+.drop-text{font-size:.78rem;color:var(--muted);line-height:1.7}
+.drop-text strong{color:var(--accent);display:block;font-size:.85rem;margin-bottom:2px}
+
+/* ── CALIBRATION PANEL ── */
+.calib-panel{background:rgba(255,209,102,.06);border:1.5px solid rgba(255,209,102,.35);border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.calib-panel.done{background:rgba(77,255,145,.06);border-color:rgba(77,255,145,.35)}
+.calib-title{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;color:var(--warn)}
+.calib-panel.done .calib-title{color:var(--accent)}
+.calib-body{font-size:.68rem;color:var(--text);line-height:1.8}
+.calib-swatches{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.calib-swatch{width:28px;height:28px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;position:relative;cursor:pointer}
+.calib-swatch:hover::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);font-size:.7rem;color:#fff;border-radius:3px}
+.calib-tag{font-size:.58rem;color:var(--muted);line-height:1.4;flex:1;min-width:120px}
+.calib-stats{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
+.calib-stat{font-size:.6rem;color:var(--muted)}
+.calib-stat strong{color:var(--accent)}
+
+/* ── ADVANCED SETTINGS (collapsed) ── */
+.adv-toggle{background:none;border:none;color:var(--muted);font-family:'Space Mono',monospace;font-size:.6rem;cursor:pointer;padding:6px 0;letter-spacing:.06em;display:flex;align-items:center;gap:5px;width:100%;margin-top:8px}
+.adv-toggle:hover{color:var(--accent)}
+.adv-body{display:none;margin-top:8px}
+.adv-body.open{display:block}
+.sl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.sl-item label{display:block;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.sl-item input[type=range]{width:100%;accent-color:var(--accent)}
+.sl-val{font-size:.62rem;color:var(--accent);font-weight:700}
+.hint{font-size:.58rem;color:var(--muted);line-height:1.6;margin-top:5px}
+
+/* ── PLATE QUEUE ── */
+#plate-queue{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.plate-item{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;transition:border-color .2s}
+.plate-item.analyzing{border-color:var(--warn)}.plate-item.done{border-color:var(--accent-dim)}.plate-item.error{border-color:var(--danger)}
+.plate-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.plate-thumb-wrap{position:relative;width:76px;height:58px;flex-shrink:0;cursor:pointer}
+.plate-thumb-wrap:hover .zoom-hint{opacity:1}
+.plate-thumb{width:76px;height:58px;object-fit:cover;border-radius:3px;border:1px solid var(--border);display:block}
+.plate-mini-canvas{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:3px;pointer-events:none}
+.zoom-hint{position:absolute;inset:0;background:rgba(0,0,0,.5);border-radius:3px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;opacity:0;transition:opacity .2s;pointer-events:none}
+.plate-fields{flex:1;display:flex;gap:6px;flex-wrap:wrap;min-width:180px}
+.plate-input{background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Space Mono',monospace;font-size:.68rem;padding:6px 8px;outline:none;flex:1;min-width:100px}
+.plate-input:focus{border-color:var(--accent)}
+.plate-input::placeholder{color:var(--muted);opacity:.5}
+.plate-count-block{min-width:70px;text-align:center}
+.plate-count{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.6rem;color:var(--accent);line-height:1;cursor:pointer}
+.plate-count:hover{opacity:.75}
+.plate-count-edit{display:none;background:var(--bg);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-family:'Space Mono',monospace;font-size:.8rem;padding:3px 6px;width:64px;outline:none}
+.plate-count-sub{font-size:.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.plate-badge{font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.plate-badge.pending{background:rgba(90,138,106,.2);color:var(--muted)}
+.plate-badge.analyzing{background:rgba(255,209,102,.15);color:var(--warn)}
+.plate-badge.done{background:rgba(77,255,145,.12);color:var(--accent)}
+.plate-badge.error{background:rgba(255,107,107,.15);color:var(--danger)}
+.plate-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:3px;border-radius:3px;line-height:1;flex-shrink:0}
+.plate-remove:hover{color:var(--danger)}
+.plate-detail{display:flex;gap:12px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:.6rem;color:var(--muted);flex-wrap:wrap;align-items:center}
+.plate-detail strong{color:var(--text)}
+.view-link{background:none;border:none;color:var(--accent);font-family:'Space Mono',monospace;font-size:.6rem;cursor:pointer;text-decoration:underline;padding:0}
+.plate-err{width:100%;font-size:.58rem;color:var(--danger);padding:3px 0 0 84px;word-break:break-word}
+.progress-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:10px;display:none}
+.progress-bar.active{display:block}
+.progress-fill{height:100%;background:var(--accent);transition:width .4s ease}
+.progress-text{font-size:.6rem;color:var(--muted);margin-top:5px;text-align:center;min-height:1.1em}
+
+/* ── RESULTS ── */
+#results-section{display:none}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:12px;text-align:center}
+.stat-val{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.7rem;color:var(--accent);line-height:1}
+.stat-lbl{font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.data-table{width:100%;border-collapse:collapse;font-size:.68rem}
+.data-table th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;font-size:.56rem;letter-spacing:.06em}
+.data-table td{padding:6px 8px;border-bottom:1px solid rgba(36,51,40,.5);color:var(--text)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(77,255,145,.03)}
+.chart-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:14px}
+.chart-ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.chart-title-inp{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Space Mono',monospace;font-size:.7rem;padding:7px 9px;outline:none;min-width:160px}
+.chart-title-inp:focus{border-color:var(--accent)}
+.chart-canvas-wrap{position:relative;height:360px}
+
+/* ── VIEWER ── */
+#viewer{display:none;position:fixed;inset:0;z-index:1000;background:#000;flex-direction:column}
+#viewer.open{display:flex}
+.vtop{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(10,15,13,.97);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.vtitle{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.1rem;color:var(--accent)}
+.vbadge{font-size:.7rem;color:var(--text);background:var(--accent-dim);padding:3px 10px;border-radius:20px}
+.vtop-right{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.vbtn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:.58rem;padding:5px 9px;border-radius:4px;cursor:pointer;transition:all .2s;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.vbtn:hover{border-color:var(--accent);color:var(--accent)}
+.vbtn.on{border-color:var(--accent);color:var(--accent);background:rgba(77,255,145,.08)}
+.vbtn.add-on{border-color:var(--accent);color:#051008;background:var(--accent)}
+.vbtn.rem-on{border-color:var(--danger);color:var(--danger);background:rgba(255,107,107,.1)}
+.vbtn.cal-on{border-color:var(--warn);color:#1a0f00;background:var(--warn);animation:pulse-warn 1.2s ease-in-out infinite}
+@keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:.7}}
+.vcarea{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:10px;background:#080808}
+#vcanvas{display:block;max-width:100%;height:auto}
+
+/* ── GUIDED PROMPT OVERLAY ── */
+.guided-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10}
+.guided-bubble{background:rgba(255,209,102,.95);color:#1a0f00;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;padding:10px 16px;border-radius:6px;text-align:center;line-height:1.6;box-shadow:0 4px 20px rgba(0,0,0,.5);max-width:280px;pointer-events:none}
+.guided-bubble .sub{font-weight:400;font-size:.62rem;opacity:.75;margin-top:3px}
+
+.vbottom{padding:6px 12px;background:rgba(10,15,13,.97);border-top:1px solid var(--border);display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.vmode{font-size:.6rem;padding:3px 9px;border-radius:3px;font-weight:700}
+.vmode.viewing{background:var(--accent-dim);color:var(--accent)}
+.vmode.calibrating{background:var(--warn);color:#1a0f00;animation:pulse-warn 1.2s ease-in-out infinite}
+.vmode.adding{background:rgba(77,255,145,.25);color:#051008}
+.vmode.removing{background:rgba(255,107,107,.2);color:var(--danger)}
+.vhint{font-size:.58rem;color:var(--muted);flex:1}
+.vcsize{display:flex;gap:5px;align-items:center;font-size:.58rem;color:var(--muted)}
+.vcsize input[type=range]{accent-color:var(--accent);width:70px}
+
+/* calibration swatch strip in viewer */
+.vcal-strip{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.vcal-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);flex-shrink:0}
+
+.key-status{font-size:.6rem;color:var(--muted);margin-top:5px}
+.key-status.ok{color:var(--accent)}
+footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;letter-spacing:.1em;opacity:.4}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">ColonyCount</div>
+  <div class="tagline">Click a colony to calibrate · Multi-plate · Excel & chart export</div>
+</header>
+
+<!-- API KEY -->
+<div class="card">
+  <div class="card-title">Label Reading Key <span style="color:var(--muted);font-size:.55rem">(optional)</span></div>
+  <div style="display:flex;gap:8px">
+    <input type="password" id="api-key" placeholder="sk-ant-api03-…" autocomplete="off">
+    <button class="btn btn-outline btn-sm" onclick="saveKey()">Save</button>
+    <button class="btn btn-outline btn-sm" id="test-btn" onclick="testKey()">Test</button>
+  </div>
+  <div class="key-status" id="key-status">Skip if you'll type treatment names manually.</div>
+</div>
+
+<!-- EXPERIMENT -->
+<div class="card">
+  <div class="card-title">Experiment</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div><div class="hint" style="margin-bottom:3px">Figure title</div><input type="text" id="exp-title" placeholder="e.g. Colony Counts by Delivery Method"></div>
+    <div><div class="hint" style="margin-bottom:3px">Y-axis label</div><input type="text" id="yaxis-label" placeholder="Colonies per plate (mean ± SD)"></div>
+  </div>
+</div>
+
+<!-- CALIBRATION STATUS -->
+<div class="card">
+  <div class="card-title">Colony Calibration</div>
+
+  <div class="calib-panel" id="calib-panel">
+    <div class="calib-title">⚠ Not calibrated yet</div>
+    <div class="calib-body">
+      Open any plate below → click <strong>🎯 Click a Colony</strong> → click directly on a typical colony in your image.<br>
+      The tool will read its <strong>color</strong> and measure its <strong>size</strong>, then detect all matching colonies.
+    </div>
+  </div>
+
+  <!-- Advanced sliders — collapsed by default -->
+  <button class="adv-toggle" onclick="toggleAdv(this)">
+    <span id="adv-arrow">▶</span> Advanced overrides <span style="font-size:.55rem;opacity:.6">(auto-set after calibration)</span>
+  </button>
+  <div class="adv-body" id="adv-body">
+    <div class="sl-grid">
+      <div class="sl-item">
+        <label>Color tolerance <span class="sl-val" id="vtol">40</span></label>
+        <input type="range" id="sl-tol" min="5" max="120" value="40" oninput="sv('vtol',this.value)">
+        <div class="hint">How far from sampled color counts as colony. Auto-set after calibration.</div>
+      </div>
+      <div class="sl-item">
+        <label>Colony diameter % <span class="sl-val" id="vmerge">1.0</span></label>
+        <input type="range" id="sl-merge" min="0.1" max="8" step="0.05" value="1.0" oninput="sv('vmerge',this.value)">
+        <div class="hint">Auto-set from colony size. Increase if crowding markers.</div>
+      </div>
+      <div class="sl-item">
+        <label>Plate inner radius % <span class="sl-val" id="vmask">85</span></label>
+        <input type="range" id="sl-mask" min="0" max="97" value="85" oninput="sv('vmask',this.value)">
+      </div>
+      <div class="sl-item">
+        <label>Rim exclusion % <span class="sl-val" id="vrim">5</span></label>
+        <input type="range" id="sl-rim" min="0" max="15" value="5" oninput="sv('vrim',this.value)">
+        <div class="hint">Increase if rim/label text gets detected.</div>
+      </div>
+      <div class="sl-item">
+        <label>Min colony pixels <span class="sl-val" id="vminpx">3</span></label>
+        <input type="range" id="sl-minpx" min="1" max="30" value="3" oninput="sv('vminpx',this.value)">
+        <div class="hint">Ignore blobs smaller than this. Filters noise.</div>
+      </div>
+      <div class="sl-item">
+        <label>Circularity filter <span class="sl-val" id="vcirc">0.4</span></label>
+        <input type="range" id="sl-circ" min="0" max="1" step="0.05" value="0.4" oninput="sv('vcirc',this.value)">
+        <div class="hint">Rejects elongated streaks/smears. 1.0 = perfect circle only. 0 = off. Auto-set after calibration.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD -->
+<div class="card">
+  <div class="card-title">Plate Images</div>
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="image/*" multiple>
+    <span class="drop-icon">🧫</span>
+    <div class="drop-text">
+      <strong>Drop plate images here</strong>
+      or click to browse — JPG, PNG, WEBP, multiple OK
+    </div>
+  </div>
+  <div id="plate-queue"></div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn btn-primary" id="detect-btn" disabled>Detect Colonies →</button>
+    <button class="btn btn-outline" id="redetect-btn" disabled>↻ Re-run All</button>
+    <button class="btn btn-outline" id="clear-btn" disabled>Clear All</button>
+  </div>
+  <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-text" id="progress-text"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results-section">
+  <div class="card">
+    <div class="card-title">Results</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val" id="s-plates">0</div><div class="stat-lbl">Plates</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-treatments">0</div><div class="stat-lbl">Treatments</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total colonies</div></div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Treatment</th><th>Replicate</th><th>Count</th><th>View & Edit</th></tr></thead>
+        <tbody id="results-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="card-title" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">Figure — Mean ± SD</div>
+    <div class="hint" style="margin-bottom:10px">Bar height = mean count across replicates of the same treatment. Error bar = standard deviation.</div>
+    <div class="chart-ctrl">
+      <input type="text" class="chart-title-inp" id="chart-title" placeholder="Chart title…">
+      <button class="btn btn-outline btn-sm" onclick="renderChart()">↻ Refresh</button>
+    </div>
+    <div class="chart-canvas-wrap"><canvas id="chart-canvas"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Export</div>
+    <div class="row">
+      <button class="btn btn-primary" onclick="exportExcel()">⬇ Excel</button>
+      <button class="btn btn-outline" onclick="exportChartPNG()">⬇ Chart PNG</button>
+      <button class="btn btn-outline" onclick="resetAll()">↺ New session</button>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN VIEWER -->
+<div id="viewer">
+  <div class="vtop">
+    <div class="vtitle" id="vtitle">Plate</div>
+    <div class="vbadge" id="vbadge">0 colonies</div>
+    <div class="vtop-right">
+      <button class="vbtn on" id="btn-ov" onclick="toggleOv()">● Markers on</button>
+      <!-- CALIBRATE btn — primary action -->
+      <button class="vbtn cal-on" id="btn-cal" onclick="setVMode('cal')">🎯 Click a Colony</button>
+      <button class="vbtn" id="btn-add" onclick="setVMode('add')">＋ Add</button>
+      <button class="vbtn" id="btn-rem" onclick="setVMode('rem')">✕ Remove</button>
+      <button class="vbtn on" id="btn-nav" onclick="setVMode('nav')">↖ Navigate</button>
+      <button class="vbtn btn-warn" onclick="redetectCurrent()">↻ Re-detect</button>
+      <div class="vcsize">
+        Marker: <input type="range" id="msize" min="3" max="28" value="7" oninput="sv('msval',this.value);redraw()"><span id="msval">7</span>px
+      </div>
+      <!-- calibration color dots strip -->
+      <div class="vcal-strip" id="vcal-strip"></div>
+      <button class="vbtn" style="border-color:var(--danger);color:var(--danger)" onclick="closeViewer()">✕ Close</button>
+    </div>
+  </div>
+  <div class="vcarea" style="position:relative" id="vcarea">
+    <canvas id="vcanvas" style="cursor:default"></canvas>
+    <!-- guided prompt shown before first calibration -->
+    <div class="guided-overlay" id="guided-overlay" style="display:none">
+      <div class="guided-bubble">
+        🎯 Click a colony to calibrate<div class="sub">Click directly on one typical colony in the image</div>
+      </div>
+    </div>
+  </div>
+  <div class="vbottom">
+    <div class="vmode viewing" id="vmode-ind">● VIEWING</div>
+    <div class="vhint" id="vhint">Click 🎯 Click a Colony → click a typical colony → computer reads color + size → ↻ Re-detect.</div>
+  </div>
+</div>
+
+<footer>ColonyCount · Click-to-calibrate · No data stored</footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let plates=[], apiKey='', chartInst=null;
+let vPlate=null, vImg=null, vShowOv=true, vMode='nav';
+let vImgData=null; // cached pixel data for current viewer image
+
+// Calibration state — set by click-to-calibrate
+const calib={
+  done: false,
+  samples: [],        // array of {r,g,b} from clicked pixels (up to ~9 from flood fill centroid ring)
+  meanR:0, meanG:0, meanB:0,  // mean of sampled pixels
+  stdR:0, stdG:0, stdB:0,     // spread
+  colonyRadiusPct: 1.0,        // colony radius as % of image width
+  colonyDiamPct:   2.0,
+};
+
+function ge(id){return document.getElementById(id);}
+function sv(id,v){ge(id).textContent=v;}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+// ══════════════════════════════════════════════
+// ADVANCED TOGGLE
+// ══════════════════════════════════════════════
+function toggleAdv(btn){
+  const b=ge('adv-body');
+  b.classList.toggle('open');
+  ge('adv-arrow').textContent=b.classList.contains('open')?'▼':'▶';
+}
+
+// ══════════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════════
+function saveKey(){
+  apiKey=ge('api-key').value.trim();
+  const st=ge('key-status');
+  if(apiKey.startsWith('sk-ant')){st.textContent='✓ Saved.';st.className='key-status ok';}
+  else{st.textContent='Should start with sk-ant…';st.className='key-status';}
+}
+async function testKey(){
+  const key=ge('api-key').value.trim()||apiKey;
+  const st=ge('key-status'),btn=ge('test-btn');
+  if(!key){st.textContent='Enter key first.';return;}
+  btn.disabled=true;st.textContent='Testing…';st.className='key-status';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]})});
+    const d=await r.json();
+    if(r.ok){apiKey=key;st.textContent='✓ Connected!';st.className='key-status ok';}
+    else{st.textContent='✗ '+(d.error?.message||JSON.stringify(d.error));st.className='key-status';}
+  }catch(e){st.textContent='✗ '+e.message;st.className='key-status';}
+  btn.disabled=false;
+}
+ge('api-key').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+
+// ══════════════════════════════════════════════
+// CLICK-TO-CALIBRATE  ← the new core feature
+//
+// When user clicks a colony pixel:
+//  1. Read exact pixel color
+//  2. Flood-fill outward to measure blob size (stops when color diverges)
+//  3. Compute mean + std of all blob pixels
+//  4. Set tolerance = 2× std (minimum 20)
+//  5. Set colony diameter from blob radius
+//  6. Update UI + sliders
+// ══════════════════════════════════════════════
+function calibrateFromClick(px, py, imgW, imgH){
+  if(!vImgData) return;
+  const data = vImgData.data;
+
+  // 1. Seed pixel
+  const idx = (Math.round(py)*imgW + Math.round(px))*4;
+  const seedR = data[idx], seedG = data[idx+1], seedB = data[idx+2];
+
+  // 2. Flood fill with BFS — expand while pixels are "similar" to seed
+  // Tolerance for fill: generous (60) so we capture the whole colony blob
+  const FILL_TOL = 60;
+  const visited = new Uint8Array(imgW*imgH);
+  const queue = [{x:Math.round(px), y:Math.round(py)}];
+  visited[Math.round(py)*imgW+Math.round(px)] = 1;
+  const blobPixels = [];
+
+  let minX=imgW,maxX=0,minY=imgH,maxY=0;
+
+  while(queue.length && blobPixels.length < 8000){
+    const {x,y} = queue.shift();
+    const i=(y*imgW+x)*4;
+    const r=data[i],g=data[i+1],b=data[i+2];
+    const dist=Math.sqrt((r-seedR)**2+(g-seedG)**2+(b-seedB)**2);
+    if(dist > FILL_TOL) continue;
+
+    blobPixels.push({r,g,b,x,y});
+    if(x<minX)minX=x; if(x>maxX)maxX=x;
+    if(y<minY)minY=y; if(y>maxY)maxY=y;
+
+    for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nx=x+dx,ny=y+dy;
+      if(nx>=0&&ny>=0&&nx<imgW&&ny<imgH&&!visited[ny*imgW+nx]){
+        visited[ny*imgW+nx]=1;
+        queue.push({x:nx,y:ny});
+      }
+    }
+  }
+
+  if(!blobPixels.length) return;
+
+  // 3. Compute mean + std of blob pixel colors
+  let sumR=0,sumG=0,sumB=0;
+  blobPixels.forEach(p=>{sumR+=p.r;sumG+=p.g;sumB+=p.b;});
+  const n=blobPixels.length;
+  const mR=sumR/n, mG=sumG/n, mB=sumB/n;
+
+  let vR=0,vG=0,vB=0;
+  blobPixels.forEach(p=>{vR+=(p.r-mR)**2;vG+=(p.g-mG)**2;vB+=(p.b-mB)**2;});
+  const sR=Math.sqrt(vR/n),sG=Math.sqrt(vG/n),sB=Math.sqrt(vB/n);
+  const colorStd=Math.sqrt(sR*sR+sG*sG+sB*sB);
+
+  // 4. Colony size from bounding box
+  const blobW=maxX-minX+1, blobH=maxY-minY+1;
+  const blobDiam=Math.max(blobW,blobH);
+  const radiusPct=(blobDiam/2)/imgW*100;
+  const diamPct=blobDiam/imgW*100;
+
+  // 5. Tolerance: 2× std, clamped
+  const tol=Math.max(20, Math.min(90, Math.round(colorStd*2.2 + 15)));
+
+  // 6. Store calibration
+  calib.done=true;
+  calib.meanR=Math.round(mR); calib.meanG=Math.round(mG); calib.meanB=Math.round(mB);
+  calib.stdR=sR; calib.stdG=sG; calib.stdB=sB;
+  calib.colonyRadiusPct=Math.max(0.1, radiusPct);
+  calib.colonyDiamPct=Math.max(0.2, diamPct);
+  calib.blobPixelCount=n;
+  calib.tol=tol;
+
+  // 7. Push to sliders
+  ge('sl-tol').value=tol; sv('vtol',tol);
+  const diamSliderVal=Math.min(8, Math.max(0.1, +diamPct.toFixed(2)));
+  ge('sl-merge').value=diamSliderVal; sv('vmerge',diamSliderVal.toFixed(2));
+  // Max blob = 5× calibrated colony area (generous but filters big algal patches)
+  ge('sl-circ').value=0.45; sv('vcirc',0.45);
+
+  // 8. Update calibration panel
+  updateCalibPanel(seedR,seedG,seedB,mR,mG,mB,n,blobDiam,imgW,tol);
+
+  // 9. Update viewer swatch strip
+  updateVCalStrip();
+
+  return {mR,mG,mB,tol,diamPct};
+}
+
+function updateCalibPanel(seedR,seedG,seedB,mR,mG,mB,n,blobDiam,imgW,tol){
+  const panel=ge('calib-panel');
+  panel.classList.add('done');
+  const hex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+  const seedHex=hex(seedR,seedG,seedB);
+  const meanHex=hex(mR,mG,mB);
+  const diamPct=(blobDiam/imgW*100).toFixed(2);
+
+  panel.innerHTML=`
+    <div class="calib-title">✓ Calibrated from colony click</div>
+    <div class="calib-body">Detection is set to find colonies matching the sampled color and size.<br>
+    Click <strong>↻ Re-detect</strong> in the viewer, or <strong>Detect Colonies →</strong> to run on all plates.</div>
+    <div class="calib-swatches">
+      <div title="Clicked pixel" style="background:${seedHex};width:28px;height:28px;border-radius:4px;border:2px solid var(--border)"></div>
+      <div title="Colony mean color" style="background:${meanHex};width:28px;height:28px;border-radius:4px;border:2px solid var(--border)"></div>
+      <div class="calib-tag">
+        Clicked: <strong>${seedHex}</strong> · Mean: <strong>${meanHex}</strong><br>
+        Colony size: <strong>${diamPct}% of image width</strong> · Blob pixels: <strong>${n}</strong><br>
+        Tolerance: <strong>±${tol}</strong> · Circularity filter: <strong>0.45</strong> (rejects streaks &amp; smears)
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:.58rem;color:var(--muted)">
+      Want to recalibrate? Open any plate and click 🎯 Click a Colony again.
+    </div>`;
+}
+
+function updateVCalStrip(){
+  const strip=ge('vcal-strip');
+  if(!calib.done){strip.innerHTML='';return;}
+  const hex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+  strip.innerHTML=`<div class="vcal-dot" style="background:${hex(calib.meanR,calib.meanG,calib.meanB)}" title="Calibrated colony color"></div>
+    <span style="font-size:.55rem;color:var(--muted)">±${calib.tol}</span>`;
+}
+
+// ══════════════════════════════════════════════
+// FILE UPLOAD
+// ══════════════════════════════════════════════
+const dropZone=ge('drop-zone'), fileInput=ge('file-input');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault();dropZone.classList.remove('drag-over');
+  if(e.dataTransfer.files.length)addFiles(Array.from(e.dataTransfer.files));
+});
+fileInput.addEventListener('change',()=>{
+  if(fileInput.files.length)addFiles(Array.from(fileInput.files));
+  fileInput.value='';
+});
+
+function addFiles(files){
+  files.filter(f=>f.type.startsWith('image/')).forEach(file=>{
+    const id='p'+Date.now()+Math.floor(Math.random()*9999);
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      plates.push({id,file,dataUrl:ev.target.result,
+        b64:ev.target.result.split(',')[1],mime:file.type,
+        treatment:'',replicate:'',count:null,colonies:[],status:'pending'});
+      renderQueue();updateBtns();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ══════════════════════════════════════════════
+// RENDER QUEUE
+// ══════════════════════════════════════════════
+function renderQueue(){
+  const q=ge('plate-queue');
+  if(!plates.length){q.innerHTML='';return;}
+  q.innerHTML=plates.map(p=>`
+    <div class="plate-item ${p.status}" id="pi-${p.id}">
+      <div class="plate-row">
+        <div class="plate-thumb-wrap" onclick="openViewer('${p.id}')">
+          <img class="plate-thumb" src="${p.dataUrl}" alt="">
+          <canvas class="plate-mini-canvas" id="mc-${p.id}"></canvas>
+          <div class="zoom-hint">${p.status==='pending'?'🎯':'⛶'}</div>
+        </div>
+        <div class="plate-fields">
+          <input class="plate-input" style="flex:1.5" placeholder="Treatment (e.g. 3 DNA)" value="${esc(p.treatment)}" oninput="upPlate('${p.id}','treatment',this.value)">
+          <input class="plate-input" style="flex:.8;min-width:70px" placeholder="Replicate" value="${esc(p.replicate)}" oninput="upPlate('${p.id}','replicate',this.value)">
+        </div>
+        <div class="plate-count-block">
+          ${p.status==='done'?`
+            <div class="plate-count" id="pc-${p.id}" onclick="startEdit('${p.id}')" title="Click to edit">${p.count}</div>
+            <input class="plate-count-edit" id="pe-${p.id}" type="number" value="${p.count}"
+              onblur="finishEdit('${p.id}')" onkeydown="if(event.key==='Enter')finishEdit('${p.id}')">
+            <div class="plate-count-sub">colonies</div>
+          `:`<div class="plate-count" style="color:var(--muted);font-size:1rem">—</div>`}
+        </div>
+        <span class="plate-badge ${p.status}">${bLabel(p.status)}</span>
+        <button class="plate-remove" onclick="removePlate('${p.id}')">✕</button>
+      </div>
+      ${p.status==='pending'?`<div class="plate-detail">
+        <button class="view-link" onclick="openViewer('${p.id}')">🎯 Open to calibrate →</button>
+      </div>`:''}
+      ${p.status==='done'?`<div class="plate-detail">
+        <span>Treatment: <strong>${esc(p.treatment||'(not set)')}</strong></span>
+        <button class="view-link" onclick="openViewer('${p.id}')">🔍 View & edit →</button>
+      </div>`:''}
+      ${p.status==='error'?`<div class="plate-err">⚠ ${esc(p.notes||'Error')}</div>`:''}
+    </div>`).join('');
+  plates.filter(p=>p.status==='done'&&p.colonies.length).forEach(drawMini);
+}
+
+function bLabel(s){return{pending:'Pending',analyzing:'Detecting…',done:'Done',error:'Error'}[s]||s;}
+function upPlate(id,k,v){const p=plates.find(x=>x.id===id);if(p)p[k]=v;}
+function removePlate(id){plates=plates.filter(x=>x.id!==id);renderQueue();updateBtns();}
+function updateBtns(){
+  ge('detect-btn').disabled=!plates.length;
+  ge('redetect-btn').disabled=!plates.some(p=>p.status==='done');
+  ge('clear-btn').disabled=!plates.length;
+}
+function startEdit(id){
+  ge('pc-'+id).style.display='none';
+  const e=ge('pe-'+id);e.style.display='block';e.focus();e.select();
+}
+function finishEdit(id){
+  const e=ge('pe-'+id),p=plates.find(x=>x.id===id);
+  if(p)p.count=parseInt(e.value)||0;
+  e.style.display='none';
+  ge('pc-'+id).style.display='';ge('pc-'+id).textContent=p.count;
+  updateResults();renderChart();
+}
+
+function drawMini(plate){
+  const cv=ge('mc-'+plate.id),img=cv?.previousElementSibling;
+  if(!cv||!img)return;
+  const W=img.naturalWidth||img.width,H=img.naturalHeight||img.height;
+  if(!W||!H)return;
+  cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);
+  const r=Math.max(3,Math.min(7,Math.round(W*0.007)));
+  const samp=plate.colonies.length>600?plate.colonies.filter((_,i)=>i%Math.ceil(plate.colonies.length/600)===0):plate.colonies;
+  samp.forEach(c=>{
+    const cx=(c.x/100)*W,cy=(c.y/100)*H;
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(77,255,145,.22)';ctx.fill();
+    ctx.strokeStyle='#4dff91';ctx.lineWidth=1;ctx.stroke();
+  });
+}
+
+// ══════════════════════════════════════════════
+// DETECTION ENGINE
+// Uses calibrated color + size if available, else falls back to sliders
+// ══════════════════════════════════════════════
+function getSettings(){
+  return{
+    tol:      +ge('sl-tol').value,
+    merge:    +ge('sl-merge').value,
+    mask:     +ge('sl-mask').value,
+    rim:      +ge('sl-rim').value,
+    minPx:    +ge('sl-minpx').value,
+    circ:     +ge('sl-circ').value,
+    sR: calib.done ? calib.meanR : 60,
+    sG: calib.done ? calib.meanG : 90,
+    sB: calib.done ? calib.meanB : 60,
+    expectedBlobPx: calib.done ? calib.blobPixelCount : null,
+    calibDone: calib.done,
+  };
+}
+
+function detectColonies(imgEl, settings){
+  return new Promise(resolve=>{
+    const W=imgEl.naturalWidth||imgEl.width, H=imgEl.naturalHeight||imgEl.height;
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const ctx=cv.getContext('2d');ctx.drawImage(imgEl,0,0);
+    const data=ctx.getImageData(0,0,W,H).data;
+
+    const {tol, merge, mask, rim, sR, sG, sB, circ, expectedBlobPx}=settings;
+    const pcx=W/2, pcy=H/2, halfMin=Math.min(W,H)/2;
+    const coloniesR=mask>0?halfMin*(mask/100):Infinity;
+    const rimR=mask>0?halfMin*((mask+rim)/100):Infinity;
+    const STEP=2, GW=Math.ceil(W/STEP), GH=Math.ceil(H/STEP);
+    const score=new Float32Array(GW*GH);
+
+    // ── Step 1: Score every pixel by color similarity ──
+    for(let gy=0;gy<GH;gy++){
+      for(let gx=0;gx<GW;gx++){
+        const x=gx*STEP,y=gy*STEP;
+        if(mask>0){
+          const dx=x-pcx,dy=y-pcy,d2=dx*dx+dy*dy;
+          if(d2>rimR*rimR||d2>coloniesR*coloniesR){score[gy*GW+gx]=0;continue;}
+        }
+        const i=(y*W+x)*4;
+        const r=data[i],g=data[i+1],b=data[i+2];
+        if(r>200&&g>200&&b>185){score[gy*GW+gx]=0;continue;}
+        if(r>175&&g>175&&b>175&&Math.abs(r-g)<15&&Math.abs(g-b)<15){score[gy*GW+gx]=0;continue;}
+        if(r>160&&g>140&&b<100){score[gy*GW+gx]=0;continue;}
+        const dist=Math.sqrt((r-sR)**2+(g-sG)**2+(b-sB)**2);
+        score[gy*GW+gx]=dist<tol?tol-dist:0;
+      }
+    }
+
+    // ── Step 2: Local maxima ──
+    const colonyDiamPx=Math.round((merge/100)*W);
+    const supR=Math.max(2,Math.round(colonyDiamPx/STEP/2));
+    const peaks=[];
+    for(let gy=0;gy<GH;gy++){
+      for(let gx=0;gx<GW;gx++){
+        const s=score[gy*GW+gx];
+        if(s<=0)continue;
+        let isMax=true;
+        outer:for(let dy=-supR;dy<=supR;dy++){
+          for(let dx=-supR;dx<=supR;dx++){
+            const ny=gy+dy,nx=gx+dx;
+            if(ny<0||nx<0||ny>=GH||nx>=GW)continue;
+            if(score[ny*GW+nx]>s){isMax=false;break outer;}
+          }
+        }
+        if(isMax)peaks.push({cx:gx*STEP,cy:gy*STEP,score:s});
+      }
+    }
+    if(!peaks.length){resolve({count:0,colonies:[]});return;}
+
+    // ── Step 3: Greedy NMS ──
+    peaks.sort((a,b)=>b.score-a.score);
+    const kept=[];
+    const minSep2=(colonyDiamPx*0.65)**2;
+    for(const p of peaks){
+      let ok=true;
+      for(const k of kept){
+        const dx=p.cx-k.cx,dy=p.cy-k.cy;
+        if(dx*dx+dy*dy<minSep2){ok=false;break;}
+      }
+      if(ok)kept.push(p);
+    }
+
+    // ── Step 4: Blob shape filter ──
+    // Flood-fill each peak to get its full bounding box + pixel count.
+    // Circularity = 4π·area / perimeter² (1.0 = perfect circle, ~0 = very elongated)
+    // We approximate using bounding box: aspect ratio W/H (or H/W, whichever <1)
+    // A round dot has ratio ≈1.0; a streak has ratio << 1.
+    // Also enforce a max blob size of 8× expected colony area to reject solid patches.
+    const colonyAreaPx = expectedBlobPx
+      ? expectedBlobPx
+      : Math.PI*(colonyDiamPx/2)*(colonyDiamPx/2);
+    const maxBlobPx = colonyAreaPx * 8; // hard ceiling — reject very large patches
+    const minBlobPx = Math.max(2, colonyAreaPx * 0.04);
+
+    const visitedMap = new Int32Array(W*H);
+    let visitGen = 0;
+    const colonies = [];
+
+    for(const p of kept){
+      visitGen++;
+      const blob = floodMeasure(
+        Math.round(p.cx), Math.round(p.cy),
+        data, W, H, sR, sG, sB, tol, visitedMap, visitGen, maxBlobPx
+      );
+
+      // Size gate
+      if(blob.count < minBlobPx) continue;
+      if(blob.count > maxBlobPx) continue;
+
+      // Circularity gate via bounding-box aspect ratio
+      // minRatio = shorter side / longer side → 1.0 = square/circle, 0 = line
+      if(circ > 0){
+        const bw = blob.maxX - blob.minX + 1;
+        const bh = blob.maxY - blob.minY + 1;
+        const ratio = Math.min(bw,bh) / Math.max(bw,bh);
+        if(ratio < circ) continue; // too elongated — it's a streak
+      }
+
+      colonies.push({cx:p.cx,cy:p.cy,area:blob.count,x:p.cx/W*100,y:p.cy/H*100});
+    }
+
+    resolve({count:colonies.length, colonies});
+  });
+}
+
+// Flood-measure: BFS flood fill that returns pixel count + bounding box.
+// Stops early if count exceeds maxCount (fast rejection).
+function floodMeasure(sx, sy, data, W, H, sR, sG, sB, tol, visited, gen, maxCount){
+  const empty={count:0,minX:sx,maxX:sx,minY:sy,maxY:sy};
+  if(sx<0||sy<0||sx>=W||sy>=H) return empty;
+  const stack=[sy*W+sx];
+  visited[sy*W+sx]=gen;
+  let count=0, minX=sx,maxX=sx,minY=sy,maxY=sy;
+  const tol2=tol*tol;
+  while(stack.length){
+    const idx=stack.pop();
+    const x=idx%W, y=Math.floor(idx/W);
+    const i=idx*4;
+    const r=data[i],g=data[i+1],b=data[i+2];
+    if((r-sR)**2+(g-sG)**2+(b-sB)**2 > tol2) continue;
+    count++;
+    if(count>maxCount) return {count,minX,maxX,minY,maxY}; // early exit
+    if(x<minX)minX=x; if(x>maxX)maxX=x;
+    if(y<minY)minY=y; if(y>maxY)maxY=y;
+    for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nx=x+dx,ny=y+dy;
+      if(nx>=0&&ny>=0&&nx<W&&ny<H){
+        const ni=ny*W+nx;
+        if(visited[ni]!==gen){visited[ni]=gen;stack.push(ni);}
+      }
+    }
+  }
+  return{count,minX,maxX,minY,maxY};
+}
+
+// ══════════════════════════════════════════════
+// LABEL READING
+// ══════════════════════════════════════════════
+async function readLabel(plate){
+  if(!apiKey)return{treatment:'',replicate:''};
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:120,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:plate.mime,data:plate.b64}},
+          {type:'text',text:`Read the yellow sticky note on this petri dish. Return ONLY JSON:\n{"treatment":"<text before last number>","replicate":"<last number>"}\nIf unreadable: {"treatment":"unknown","replicate":""}`}
+        ]}]})});
+    const d=await r.json();if(!r.ok)return{treatment:'',replicate:''};
+    const parsed=JSON.parse(d.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim());
+    return{treatment:parsed.treatment||'',replicate:parsed.replicate||''};
+  }catch{return{treatment:'',replicate:''};}
+}
+
+// ══════════════════════════════════════════════
+// DETECT ALL / RE-DETECT
+// ══════════════════════════════════════════════
+ge('detect-btn').addEventListener('click',detectAll);
+ge('redetect-btn').addEventListener('click',redetectAll);
+ge('clear-btn').addEventListener('click',()=>{
+  plates=[];renderQueue();updateBtns();
+  ge('results-section').style.display='none';ge('progress-text').textContent='';
+});
+
+async function detectAll(){
+  const toRun=plates.filter(p=>p.status==='pending'||p.status==='error');
+  if(!toRun.length)return;
+  if(!calib.done){
+    ge('progress-text').textContent='⚠ Calibrate first: open a plate → 🎯 Click a Colony.';
+    return;
+  }
+  toRun.forEach(p=>{p.status='pending';p.notes='';});
+  ge('detect-btn').disabled=true;
+  const bar=ge('progress-bar');bar.classList.add('active');
+  const fill=ge('progress-fill'),txt=ge('progress-text');
+  const settings=getSettings();let done=0;
+  for(const plate of toRun){
+    plate.status='analyzing';updateItemStatus(plate);
+    txt.textContent=`[${done+1}/${toRun.length}] Detecting: "${plate.file.name}"…`;
+    try{
+      const img=await loadImg(plate.dataUrl);
+      const det=await detectColonies(img,settings);
+      plate.count=det.count;plate.colonies=det.colonies;
+      if(apiKey&&!plate.treatment){
+        txt.textContent=`[${done+1}/${toRun.length}] Reading label…`;
+        const lbl=await readLabel(plate);
+        if(lbl.treatment&&lbl.treatment!=='unknown'){plate.treatment=lbl.treatment;}
+        if(lbl.replicate&&!plate.replicate){plate.replicate=lbl.replicate;}
+      }
+      plate.status='done';
+    }catch(err){plate.status='error';plate.notes=err.message;}
+    done++;fill.style.width=(done/toRun.length*100)+'%';
+    renderQueue();if(plate.status==='done')drawMini(plate);
+  }
+  bar.classList.remove('active');
+  txt.textContent='✓ Done. Open any plate to inspect and correct with ＋ Add / ✕ Remove.';
+  ge('detect-btn').disabled=false;ge('detect-btn').textContent='↻ Re-analyze Pending';
+  showResults();updateBtns();
+}
+
+async function redetectAll(){
+  if(!calib.done){ge('progress-text').textContent='⚠ Calibrate first: open a plate → 🎯 Click a Colony.';return;}
+  const settings=getSettings();
+  const txt=ge('progress-text'),bar=ge('progress-bar');bar.classList.add('active');
+  const fill=ge('progress-fill');
+  const dp=plates.filter(p=>p.status==='done');let done=0;
+  for(const plate of dp){
+    txt.textContent=`Re-detecting: "${plate.file.name}"…`;
+    const img=await loadImg(plate.dataUrl);
+    const det=await detectColonies(img,settings);
+    plate.count=det.count;plate.colonies=det.colonies;
+    done++;fill.style.width=(done/dp.length*100)+'%';
+    drawMini(plate);
+  }
+  bar.classList.remove('active');txt.textContent='✓ Re-detection done.';
+  renderQueue();updateResults();renderChart();
+}
+
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
+function updateItemStatus(plate){
+  const el=ge('pi-'+plate.id);if(!el)return;
+  el.className='plate-item '+plate.status;
+  const b=el.querySelector('.plate-badge');
+  if(b){b.className='plate-badge '+plate.status;b.textContent=bLabel(plate.status);}
+}
+
+// ══════════════════════════════════════════════
+// VIEWER
+// ══════════════════════════════════════════════
+function openViewer(id){
+  const p=plates.find(x=>x.id===id);
+  if(!p||p.status==='analyzing')return; // don't open mid-detection
+  vPlate=p;vShowOv=true;
+  // If not calibrated, start in cal mode; else nav
+  vMode = calib.done ? 'nav' : 'cal';
+  ge('vtitle').textContent=p.treatment||p.file?.name||'Plate';
+  updateVModeUI();
+  updateVCalStrip();
+  ge('viewer').classList.add('open');document.body.style.overflow='hidden';
+  loadImg(p.dataUrl).then(img=>{
+    vImg=img;
+    // Cache pixel data
+    const tmpCv=document.createElement('canvas');
+    tmpCv.width=img.naturalWidth;tmpCv.height=img.naturalHeight;
+    const tmpCtx=tmpCv.getContext('2d');tmpCtx.drawImage(img,0,0);
+    vImgData=tmpCtx.getImageData(0,0,img.naturalWidth,img.naturalHeight);
+    redraw();
+  });
+  // Show guided overlay if not calibrated
+  ge('guided-overlay').style.display=calib.done?'none':'flex';
+}
+
+function closeViewer(){
+  ge('viewer').classList.remove('open');document.body.style.overflow='';
+  if(vPlate&&vPlate.status==='done'){
+    vPlate.count=vPlate.colonies.length;
+    renderQueue();drawMini(vPlate);updateResults();renderChart();
+  } else if(vPlate){
+    renderQueue();
+  }
+  vPlate=null;vImg=null;vImgData=null;
+}
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer();});
+
+function setVMode(m){vMode=m;updateVModeUI();}
+function toggleOv(){
+  vShowOv=!vShowOv;
+  ge('btn-ov').textContent=vShowOv?'● Markers on':'○ Markers off';
+  ge('btn-ov').classList.toggle('on',vShowOv);
+  redraw();
+}
+function updateVModeUI(){
+  // Reset all buttons
+  ge('btn-cal').className='vbtn'+(vMode==='cal'?' cal-on':'');
+  ge('btn-add').className='vbtn'+(vMode==='add'?' add-on':'');
+  ge('btn-rem').className='vbtn'+(vMode==='rem'?' rem-on':'');
+  ge('btn-nav').className='vbtn'+(vMode==='nav'?' on':'');
+
+  const ind=ge('vmode-ind'),hint=ge('vhint'),vc=ge('vcanvas');
+
+  // Guided overlay: show only in cal mode when not calibrated
+  ge('guided-overlay').style.display=(vMode==='cal'&&!calib.done)?'flex':'none';
+
+  if(vMode==='cal'){
+    ind.className='vmode calibrating';ind.textContent='🎯 CALIBRATE';
+    hint.textContent='Click directly on a typical colony → computer reads its color and size automatically.';
+    vc.style.cursor='crosshair';
+  } else if(vMode==='add'){
+    ind.className='vmode adding';ind.textContent='＋ ADD';
+    hint.textContent='Click anywhere to add a colony marker.';vc.style.cursor='crosshair';
+  } else if(vMode==='rem'){
+    ind.className='vmode removing';ind.textContent='✕ REMOVE';
+    hint.textContent='Click a marker to remove it.';vc.style.cursor='pointer';
+  } else {
+    ind.className='vmode viewing';ind.textContent='● VIEWING';
+    hint.textContent=calib.done
+      ? 'Calibrated ✓ — click ↻ Re-detect to apply to this plate. Use ＋ Add / ✕ Remove to correct.'
+      : 'Click 🎯 Click a Colony to calibrate detection from your image.';
+    vc.style.cursor='default';
+  }
+}
+
+// ── Canvas click handler ──
+ge('vcanvas').addEventListener('click',function(e){
+  if(!vPlate||!vImg)return;
+  const cv=this,rect=cv.getBoundingClientRect();
+  const sx=cv.width/rect.width,sy=cv.height/rect.height;
+  const px=(e.clientX-rect.left)*sx,py=(e.clientY-rect.top)*sy;
+
+  if(vMode==='cal'){
+    // Run calibration
+    const result=calibrateFromClick(px,py,vImg.naturalWidth,vImg.naturalHeight);
+    if(result){
+      // Draw calibration ring on canvas to confirm
+      const ctx=cv.getContext('2d');
+      const R=Math.round(calib.colonyRadiusPct/100*vImg.naturalWidth);
+      ctx.strokeStyle='#ffd166';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(px,py,R+4,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle='rgba(255,209,102,.4)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(px,py,R*2,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle='#ffd166';ctx.font='bold 13px "Space Mono",monospace';
+      ctx.textAlign='center';ctx.fillText('✓',px,py+5);
+
+      setVMode('nav');
+      ge('vhint').textContent=`✓ Calibrated! Color: RGB(${calib.meanR},${calib.meanG},${calib.meanB}), size: ${calib.colonyDiamPct.toFixed(2)}% — click ↻ Re-detect now.`;
+
+      // Auto-redetect
+      redetectCurrent();
+    }
+    return;
+  }
+
+  const r=parseInt(ge('msize').value)||7;
+  const hitR=Math.max(r*2.5,16);
+  const xp=px/cv.width*100,yp=py/cv.height*100;
+
+  if(vMode==='add'){
+    vPlate.colonies.push({cx:Math.round(px),cy:Math.round(py),area:50,x:xp,y:yp,manual:true});
+    vPlate.count=vPlate.colonies.length;
+    updateVBadge();redraw();
+  } else if(vMode==='rem'){
+    let best=-1,bestD=Infinity;
+    vPlate.colonies.forEach((c,i)=>{
+      const cx=(c.x/100)*cv.width,cy=(c.y/100)*cv.height;
+      const d=Math.sqrt((px-cx)**2+(py-cy)**2);
+      if(d<bestD&&d<hitR){best=i;bestD=d;}
+    });
+    if(best!==-1){vPlate.colonies.splice(best,1);vPlate.count=vPlate.colonies.length;updateVBadge();redraw();}
+  }
+});
+
+function updateVBadge(){if(vPlate)ge('vbadge').textContent=vPlate.colonies.length+' colonies';}
+
+async function redetectCurrent(){
+  if(!vPlate||!vImg)return;
+  if(!calib.done){ge('vhint').textContent='⚠ Click 🎯 Click a Colony first to calibrate.';setVMode('cal');return;}
+  ge('vhint').textContent='Detecting…';
+  const det=await detectColonies(vImg,getSettings());
+  vPlate.colonies=det.colonies;vPlate.count=det.count;
+  vPlate.status='done'; // mark done so it shows count
+  updateVBadge();redraw();drawMini(vPlate);
+  updateItemStatus(vPlate);showResults();updateBtns();
+  ge('vhint').textContent=`${det.count} colonies found. Use ＋ Add / ✕ Remove to correct, or 🎯 Click a Colony to recalibrate.`;
+}
+
+function redraw(){
+  if(!vPlate||!vImg)return;
+  const cv=ge('vcanvas');
+  cv.width=vImg.naturalWidth;cv.height=vImg.naturalHeight;
+  const ctx=cv.getContext('2d');ctx.drawImage(vImg,0,0);
+  updateVBadge();
+  if(!vShowOv||!vPlate.colonies.length)return;
+  const W=cv.width,H=cv.height;
+  const r=parseInt(ge('msize').value)||7;
+  const fs=Math.max(7,r+2);
+  vPlate.colonies.forEach((c,i)=>{
+    const cx=(c.x/100)*W,cy=(c.y/100)*H;
+    const color=c.manual?'#ff9f43':'#4dff91';
+    const fill=c.manual?'rgba(255,159,67,.2)':'rgba(77,255,145,.15)';
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle=fill;ctx.fill();
+    ctx.strokeStyle=color;ctx.lineWidth=Math.max(1,r*.12);ctx.stroke();
+    if(vPlate.colonies.length<=500){
+      ctx.font=`bold ${fs}px "Space Mono",monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(0,10,3,.8)';ctx.fillText(i+1,cx+.5,cy+.5);
+      ctx.fillStyle='#e8ffe8';ctx.fillText(i+1,cx,cy);
+    }
+  });
+  const items=[{c:'#4dff91',l:'Detected'},{c:'#ff9f43',l:'Manually added'}];
+  ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(10,10,170,14+items.length*22);
+  items.forEach(({c,l},i)=>{
+    const y=10+20+i*22;
+    ctx.beginPath();ctx.arc(22,y,7,0,Math.PI*2);
+    const cr=parseInt(c.slice(1,3),16),cg=parseInt(c.slice(3,5),16),cb=parseInt(c.slice(5,7),16);
+    ctx.fillStyle=`rgba(${cr},${cg},${cb},.25)`;ctx.fill();
+    ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.font=`${Math.max(11,Math.round(W*0.011))}px "Space Mono",monospace`;
+    ctx.fillStyle='#d4f0e0';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l,34,y);
+  });
+}
+
+// ══════════════════════════════════════════════
+// RESULTS + CHART
+// ══════════════════════════════════════════════
+function showResults(){
+  const done=plates.filter(p=>p.status==='done');if(!done.length)return;
+  ge('results-section').style.display='block';
+  const t=ge('exp-title').value.trim();if(t)ge('chart-title').value=t;
+  updateResults();renderChart();
+  ge('results-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function updateResults(){
+  const done=plates.filter(p=>p.status==='done');
+  ge('s-plates').textContent=done.length;
+  ge('s-treatments').textContent=[...new Set(done.map(p=>p.treatment||'Unnamed'))].length;
+  ge('s-total').textContent=done.reduce((s,p)=>s+(p.count||0),0);
+  ge('results-tbody').innerHTML=done.map((p,i)=>`
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td>${esc(p.treatment||'—')}</td>
+      <td>${esc(p.replicate||'—')}</td>
+      <td style="color:var(--accent);font-family:'Instrument Serif',serif;font-size:1.1rem">${p.count}</td>
+      <td><button class="view-link" onclick="openViewer('${p.id}')">🔍 View & edit</button></td>
+    </tr>`).join('');
+}
+
+function renderChart(){
+  const done=plates.filter(p=>p.status==='done');if(!done.length)return;
+  const groups={};
+  done.forEach(p=>{const t=p.treatment||'Unnamed';if(!groups[t])groups[t]=[];groups[t].push(p.count||0);});
+  const labels=Object.keys(groups);
+  const means=labels.map(t=>{const v=groups[t];return v.reduce((a,b)=>a+b,0)/v.length;});
+  const sds=labels.map((t,i)=>{
+    const v=groups[t];if(v.length<2)return 0;
+    const m=means[i];return Math.sqrt(v.reduce((s,x)=>s+(x-m)**2,0)/(v.length-1));
+  });
+  const ns=labels.map(t=>groups[t].length);
+  const title=ge('chart-title').value||ge('exp-title').value||'Colony Counts by Treatment';
+  const yLabel=ge('yaxis-label').value||'Colonies per plate (mean ± SD)';
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  const ctx=ge('chart-canvas').getContext('2d');
+  chartInst=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[{label:'Mean colonies',data:means,
+      backgroundColor:'rgba(41,128,185,.82)',borderColor:'rgba(41,128,185,1)',
+      borderWidth:1.5,borderRadius:2,_sds:sds,_ns:ns}]},
+    plugins:[{id:'eb',afterDraw(chart){
+      const{ctx:c,scales:{x,y}}=chart;
+      chart.data.datasets.forEach((ds,di)=>{
+        if(!ds._sds)return;
+        ds._sds.forEach((sd,i)=>{
+          if(!sd)return;
+          const bar=chart.getDatasetMeta(di).data[i];
+          const mean=ds.data[i];
+          const xp=bar.x,yt=y.getPixelForValue(mean+sd),yb=y.getPixelForValue(Math.max(0,mean-sd));
+          c.save();c.strokeStyle='#111';c.lineWidth=1.8;
+          c.beginPath();c.moveTo(xp,yt);c.lineTo(xp,yb);
+          c.moveTo(xp-7,yt);c.lineTo(xp+7,yt);c.moveTo(xp-7,yb);c.lineTo(xp+7,yb);
+          c.stroke();c.restore();
+        });
+      });
+    }}],
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        title:{display:true,text:title,font:{size:13,family:"'Space Mono',monospace"},color:'#111',padding:{bottom:14}},
+        tooltip:{callbacks:{label:ctx=>{
+          const i=ctx.dataIndex,sd=sds[i],n=ns[i];
+          if(n>1)return`Mean: ${ctx.parsed.y.toFixed(1)} ± ${sd.toFixed(1)} SD  (n=${n})`;
+          return`Count: ${ctx.parsed.y.toFixed(0)}  (n=1, no SD)`;
+        }}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10,family:"'Space Mono',monospace"},maxRotation:40,color:'#222'}},
+        y:{beginAtZero:true,title:{display:true,text:yLabel,font:{size:11},color:'#333'},
+          ticks:{font:{size:10},color:'#222'},grid:{color:'rgba(0,0,0,.07)'}}
+      }}
+  });
+}
+
+// ══════════════════════════════════════════════
+// EXPORT
+// ══════════════════════════════════════════════
+function exportExcel(){
+  const done=plates.filter(p=>p.status==='done');if(!done.length)return;
+  const raw=[['Treatment','Replicate','Colony Count']];
+  done.forEach(p=>raw.push([p.treatment||'',p.replicate||'',p.count]));
+  const groups={};
+  done.forEach(p=>{const t=p.treatment||'Unnamed';if(!groups[t])groups[t]=[];groups[t].push(p.count||0);});
+  const sum=[['Treatment','N (replicates)','Mean','SD','Min','Max']];
+  Object.entries(groups).forEach(([t,v])=>{
+    const m=v.reduce((a,b)=>a+b,0)/v.length;
+    const sd=v.length>1?Math.sqrt(v.reduce((s,x)=>s+(x-m)**2,0)/(v.length-1)):0;
+    sum.push([t,v.length,+m.toFixed(2),+sd.toFixed(2),Math.min(...v),Math.max(...v)]);
+  });
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(raw),'Raw Data');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sum),'Mean ± SD');
+  XLSX.writeFile(wb,(ge('exp-title').value||'colony-counts').replace(/\s+/g,'_')+'.xlsx');
+}
+
+function exportChartPNG(){
+  if(!chartInst)return;
+  const orig=ge('chart-canvas');
+  const tmp=document.createElement('canvas');tmp.width=orig.width;tmp.height=orig.height;
+  const tc=tmp.getContext('2d');tc.fillStyle='#fff';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(orig,0,0);
+  const a=document.createElement('a');
+  a.download=(ge('exp-title').value||'chart').replace(/\s+/g,'_')+'.png';
+  a.href=tmp.toDataURL('image/png');a.click();
+}
+
+function resetAll(){
+  plates=[];renderQueue();updateBtns();
+  ge('results-section').style.display='none';
+  ge('progress-text').textContent='';ge('progress-fill').style.width='0%';
+  ge('detect-btn').textContent='Detect Colonies →';
+  if(chartInst){chartInst.destroy();chartInst=null;}
+}
+
+['chart-title','yaxis-label','exp-title'].forEach(id=>{
+  ge(id).addEventListener('input',()=>{if(chartInst)renderChart();});
+});
+</script>
+</body>
+</html>
