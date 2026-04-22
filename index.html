@@ -37,33 +37,17 @@ input::placeholder{color:var(--muted);opacity:.5}
 .drop-icon{font-size:2rem;margin-bottom:8px;display:block}
 .drop-text{font-size:.78rem;color:var(--muted);line-height:1.7}
 .drop-text strong{color:var(--accent);display:block;font-size:.85rem;margin-bottom:2px}
-
-/* ── CALIBRATION PANEL ── */
-.calib-panel{background:rgba(255,209,102,.06);border:1.5px solid rgba(255,209,102,.35);border-radius:6px;padding:14px 16px;margin-bottom:12px}
-.calib-panel.done{background:rgba(77,255,145,.06);border-color:rgba(77,255,145,.35)}
-.calib-title{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;color:var(--warn)}
-.calib-panel.done .calib-title{color:var(--accent)}
-.calib-body{font-size:.68rem;color:var(--text);line-height:1.8}
-.calib-swatches{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
-.calib-swatch{width:28px;height:28px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;position:relative;cursor:pointer}
-.calib-swatch:hover::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);font-size:.7rem;color:#fff;border-radius:3px}
-.calib-tag{font-size:.58rem;color:var(--muted);line-height:1.4;flex:1;min-width:120px}
-.calib-stats{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
-.calib-stat{font-size:.6rem;color:var(--muted)}
-.calib-stat strong{color:var(--accent)}
-
-/* ── ADVANCED SETTINGS (collapsed) ── */
-.adv-toggle{background:none;border:none;color:var(--muted);font-family:'Space Mono',monospace;font-size:.6rem;cursor:pointer;padding:6px 0;letter-spacing:.06em;display:flex;align-items:center;gap:5px;width:100%;margin-top:8px}
-.adv-toggle:hover{color:var(--accent)}
-.adv-body{display:none;margin-top:8px}
-.adv-body.open{display:block}
 .sl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .sl-item label{display:block;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
 .sl-item input[type=range]{width:100%;accent-color:var(--accent)}
 .sl-val{font-size:.62rem;color:var(--accent);font-weight:700}
-.hint{font-size:.58rem;color:var(--muted);line-height:1.6;margin-top:5px}
-
-/* ── PLATE QUEUE ── */
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.preset-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:.58rem;padding:4px 8px;border-radius:3px;cursor:pointer;transition:all .2s}
+.preset-btn:hover,.preset-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(77,255,145,.06)}
+.swatch-row{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
+.swatch{width:32px;height:32px;border-radius:4px;border:2px solid var(--border);flex-shrink:0}
+.swatch-info{font-size:.62rem;color:var(--muted);line-height:1.8}
+.swatch-info strong{color:var(--accent)}
 #plate-queue{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .plate-item{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;transition:border-color .2s}
 .plate-item.analyzing{border-color:var(--warn)}.plate-item.done{border-color:var(--accent-dim)}.plate-item.error{border-color:var(--danger)}
@@ -97,8 +81,6 @@ input::placeholder{color:var(--muted);opacity:.5}
 .progress-bar.active{display:block}
 .progress-fill{height:100%;background:var(--accent);transition:width .4s ease}
 .progress-text{font-size:.6rem;color:var(--muted);margin-top:5px;text-align:center;min-height:1.1em}
-
-/* ── RESULTS ── */
 #results-section{display:none}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
 .stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:12px;text-align:center}
@@ -114,8 +96,6 @@ input::placeholder{color:var(--muted);opacity:.5}
 .chart-title-inp{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Space Mono',monospace;font-size:.7rem;padding:7px 9px;outline:none;min-width:160px}
 .chart-title-inp:focus{border-color:var(--accent)}
 .chart-canvas-wrap{position:relative;height:360px}
-
-/* ── VIEWER ── */
 #viewer{display:none;position:fixed;inset:0;z-index:1000;background:#000;flex-direction:column}
 #viewer.open{display:flex}
 .vtop{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(10,15,13,.97);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
@@ -127,32 +107,24 @@ input::placeholder{color:var(--muted);opacity:.5}
 .vbtn.on{border-color:var(--accent);color:var(--accent);background:rgba(77,255,145,.08)}
 .vbtn.add-on{border-color:var(--accent);color:#051008;background:var(--accent)}
 .vbtn.rem-on{border-color:var(--danger);color:var(--danger);background:rgba(255,107,107,.1)}
-.vbtn.cal-on{border-color:var(--warn);color:#1a0f00;background:var(--warn);animation:pulse-warn 1.2s ease-in-out infinite}
-@keyframes pulse-warn{0%,100%{opacity:1}50%{opacity:.7}}
+.vbtn.samp-on{border-color:var(--warn);color:#051008;background:var(--warn)}
 .vcarea{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:10px;background:#080808}
 #vcanvas{display:block;max-width:100%;height:auto}
-
-/* ── GUIDED PROMPT OVERLAY ── */
-.guided-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10}
-.guided-bubble{background:rgba(255,209,102,.95);color:#1a0f00;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;padding:10px 16px;border-radius:6px;text-align:center;line-height:1.6;box-shadow:0 4px 20px rgba(0,0,0,.5);max-width:280px;pointer-events:none}
-.guided-bubble .sub{font-weight:400;font-size:.62rem;opacity:.75;margin-top:3px}
-
 .vbottom{padding:6px 12px;background:rgba(10,15,13,.97);border-top:1px solid var(--border);display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-shrink:0}
 .vmode{font-size:.6rem;padding:3px 9px;border-radius:3px;font-weight:700}
 .vmode.viewing{background:var(--accent-dim);color:var(--accent)}
-.vmode.calibrating{background:var(--warn);color:#1a0f00;animation:pulse-warn 1.2s ease-in-out infinite}
 .vmode.adding{background:rgba(77,255,145,.25);color:#051008}
 .vmode.removing{background:rgba(255,107,107,.2);color:var(--danger)}
+.vmode.sampling{background:var(--warn);color:#051008}
 .vhint{font-size:.58rem;color:var(--muted);flex:1}
 .vcsize{display:flex;gap:5px;align-items:center;font-size:.58rem;color:var(--muted)}
 .vcsize input[type=range]{accent-color:var(--accent);width:70px}
-
-/* calibration swatch strip in viewer */
-.vcal-strip{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.vcal-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);flex-shrink:0}
-
+.vswatch{width:18px;height:18px;border-radius:3px;border:1px solid var(--border);flex-shrink:0}
 .key-status{font-size:.6rem;color:var(--muted);margin-top:5px}
 .key-status.ok{color:var(--accent)}
+.hint{font-size:.58rem;color:var(--muted);line-height:1.6;margin-top:5px}
+.callout{background:rgba(77,255,145,.05);border:1px solid var(--accent-dim);border-radius:4px;padding:10px 12px;font-size:.65rem;color:var(--text);line-height:1.8;margin-bottom:10px}
+.callout strong{color:var(--accent)}
 footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;letter-spacing:.1em;opacity:.4}
 </style>
 </head>
@@ -160,7 +132,7 @@ footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;let
 <div class="wrap">
 <header>
   <div class="logo">ColonyCount</div>
-  <div class="tagline">Click a colony to calibrate · Multi-plate · Excel & chart export</div>
+  <div class="tagline">Pixel detection · Multi-plate · Excel & chart export</div>
 </header>
 
 <!-- API KEY -->
@@ -183,54 +155,51 @@ footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;let
   </div>
 </div>
 
-<!-- CALIBRATION STATUS -->
+<!-- DETECTION SETTINGS -->
 <div class="card">
-  <div class="card-title">Colony Calibration</div>
+  <div class="card-title">Detection Settings</div>
 
-  <div class="calib-panel" id="calib-panel">
-    <div class="calib-title">⚠ Not calibrated yet</div>
-    <div class="calib-body">
-      Open any plate below → click <strong>🎯 Click a Colony</strong> → click directly on a typical colony in your image.<br>
-      The tool will read its <strong>color</strong> and measure its <strong>size</strong>, then detect all matching colonies.
+  <div class="callout">
+    <strong>How it works:</strong> Scans every pixel for blobs matching the colony color.
+    If circles miss colonies, click <strong>🎯 Sample colony</strong> in the viewer, or adjust the sliders.<br>
+    <strong>Tip:</strong> Upload a plate → click its thumbnail → sample a colony → ↻ Re-detect.
+  </div>
+
+  <div class="sl-grid">
+    <div class="sl-item">
+      <label>Colony diameter (% img width) <span class="sl-val" id="vmerge">1.4</span>%</label>
+      <input type="range" id="sl-merge" min="0.2" max="8" step="0.1" value="1.4" oninput="sv('vmerge',this.value)">
+      <div class="hint">⬆ Too many circles per colony → increase. ⬇ Missing colonies → decrease.</div>
+    </div>
+    <div class="sl-item">
+      <label>Color tolerance <span class="sl-val" id="vtol">35</span></label>
+      <input type="range" id="sl-tol" min="5" max="100" value="35" oninput="sv('vtol',this.value)">
+      <div class="hint">How far from sampled color counts as a colony. ⬆ = more permissive.</div>
+    </div>
+    <div class="sl-item">
+      <label>Plate inner radius % <span class="sl-val" id="vmask">85</span></label>
+      <input type="range" id="sl-mask" min="0" max="97" value="85" oninput="sv('vmask',this.value)">
+    </div>
+    <div class="sl-item">
+      <label>Rim exclusion % <span class="sl-val" id="vrim">5</span></label>
+      <input type="range" id="sl-rim" min="0" max="15" value="5" oninput="sv('vrim',this.value)">
+      <div class="hint">Increase if plate rim or label text gets detected.</div>
     </div>
   </div>
 
-  <!-- Advanced sliders — collapsed by default -->
-  <button class="adv-toggle" onclick="toggleAdv(this)">
-    <span id="adv-arrow">▶</span> Advanced overrides <span style="font-size:.55rem;opacity:.6">(auto-set after calibration)</span>
-  </button>
-  <div class="adv-body" id="adv-body">
-    <div class="sl-grid">
-      <div class="sl-item">
-        <label>Color tolerance <span class="sl-val" id="vtol">40</span></label>
-        <input type="range" id="sl-tol" min="5" max="120" value="40" oninput="sv('vtol',this.value)">
-        <div class="hint">How far from sampled color counts as colony. Auto-set after calibration.</div>
-      </div>
-      <div class="sl-item">
-        <label>Colony diameter % <span class="sl-val" id="vmerge">1.0</span></label>
-        <input type="range" id="sl-merge" min="0.1" max="8" step="0.05" value="1.0" oninput="sv('vmerge',this.value)">
-        <div class="hint">Auto-set from colony size. Increase if crowding markers.</div>
-      </div>
-      <div class="sl-item">
-        <label>Plate inner radius % <span class="sl-val" id="vmask">85</span></label>
-        <input type="range" id="sl-mask" min="0" max="97" value="85" oninput="sv('vmask',this.value)">
-      </div>
-      <div class="sl-item">
-        <label>Rim exclusion % <span class="sl-val" id="vrim">5</span></label>
-        <input type="range" id="sl-rim" min="0" max="15" value="5" oninput="sv('vrim',this.value)">
-        <div class="hint">Increase if rim/label text gets detected.</div>
-      </div>
-      <div class="sl-item">
-        <label>Min colony pixels <span class="sl-val" id="vminpx">3</span></label>
-        <input type="range" id="sl-minpx" min="1" max="30" value="3" oninput="sv('vminpx',this.value)">
-        <div class="hint">Ignore blobs smaller than this. Filters noise.</div>
-      </div>
-      <div class="sl-item">
-        <label>Circularity filter <span class="sl-val" id="vcirc">0.4</span></label>
-        <input type="range" id="sl-circ" min="0" max="1" step="0.05" value="0.4" oninput="sv('vcirc',this.value)">
-        <div class="hint">Rejects elongated streaks/smears. 1.0 = perfect circle only. 0 = off. Auto-set after calibration.</div>
-      </div>
+  <div class="swatch-row" id="swatch-row">
+    <div class="swatch" id="color-swatch" style="background:#2a5c3a"></div>
+    <div class="swatch-info" id="swatch-info">
+      <strong>Sampled colony color:</strong> default (dark teal)<br>
+      Open a plate and click 🎯 Sample colony to calibrate from your actual image.
     </div>
+  </div>
+
+  <div class="preset-row">
+    <span style="font-size:.58rem;color:var(--muted);align-self:center">Quick presets:</span>
+    <button class="preset-btn active" onclick="applyPreset('teal',this)">🟢 Dark teal</button>
+    <button class="preset-btn" onclick="applyPreset('black',this)">⚫ Dark/black</button>
+    <button class="preset-btn" onclick="applyPreset('bright',this)">🌿 Bright green</button>
   </div>
 </div>
 
@@ -274,7 +243,7 @@ footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;let
 
   <div class="chart-wrap">
     <div class="card-title" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">Figure — Mean ± SD</div>
-    <div class="hint" style="margin-bottom:10px">Bar height = mean count across replicates of the same treatment. Error bar = standard deviation.</div>
+    <div class="hint" style="margin-bottom:10px">Bar height = mean count across replicates of the same treatment. Error bar = standard deviation. If only one plate per treatment, bar shows that count with no error bar.</div>
     <div class="chart-ctrl">
       <input type="text" class="chart-title-inp" id="chart-title" placeholder="Chart title…">
       <button class="btn btn-outline btn-sm" onclick="renderChart()">↻ Refresh</button>
@@ -299,8 +268,7 @@ footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;let
     <div class="vbadge" id="vbadge">0 colonies</div>
     <div class="vtop-right">
       <button class="vbtn on" id="btn-ov" onclick="toggleOv()">● Markers on</button>
-      <!-- CALIBRATE btn — primary action -->
-      <button class="vbtn cal-on" id="btn-cal" onclick="setVMode('cal')">🎯 Click a Colony</button>
+      <button class="vbtn" id="btn-samp" onclick="setVMode('samp')" title="Click a colony to sample its exact color">🎯 Sample colony</button>
       <button class="vbtn" id="btn-add" onclick="setVMode('add')">＋ Add</button>
       <button class="vbtn" id="btn-rem" onclick="setVMode('rem')">✕ Remove</button>
       <button class="vbtn on" id="btn-nav" onclick="setVMode('nav')">↖ Navigate</button>
@@ -308,27 +276,18 @@ footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;let
       <div class="vcsize">
         Marker: <input type="range" id="msize" min="3" max="28" value="7" oninput="sv('msval',this.value);redraw()"><span id="msval">7</span>px
       </div>
-      <!-- calibration color dots strip -->
-      <div class="vcal-strip" id="vcal-strip"></div>
+      <div class="vswatch" id="v-swatch" style="background:#2a5c3a" title="Current sampled color"></div>
       <button class="vbtn" style="border-color:var(--danger);color:var(--danger)" onclick="closeViewer()">✕ Close</button>
     </div>
   </div>
-  <div class="vcarea" style="position:relative" id="vcarea">
-    <canvas id="vcanvas" style="cursor:default"></canvas>
-    <!-- guided prompt shown before first calibration -->
-    <div class="guided-overlay" id="guided-overlay" style="display:none">
-      <div class="guided-bubble">
-        🎯 Click a colony to calibrate<div class="sub">Click directly on one typical colony in the image</div>
-      </div>
-    </div>
-  </div>
+  <div class="vcarea"><canvas id="vcanvas" style="cursor:default"></canvas></div>
   <div class="vbottom">
     <div class="vmode viewing" id="vmode-ind">● VIEWING</div>
-    <div class="vhint" id="vhint">Click 🎯 Click a Colony → click a typical colony → computer reads color + size → ↻ Re-detect.</div>
+    <div class="vhint" id="vhint">Open a plate → 🎯 Sample colony (click a typical colony) → ↻ Re-detect → fine-tune with ＋ Add / ✕ Remove.</div>
   </div>
 </div>
 
-<footer>ColonyCount · Click-to-calibrate · No data stored</footer>
+<footer>ColonyCount · Pixel detection · No data stored</footer>
 </div>
 
 <script>
@@ -337,30 +296,12 @@ footer{margin-top:50px;font-size:.56rem;color:var(--muted);text-align:center;let
 // ══════════════════════════════════════════════
 let plates=[], apiKey='', chartInst=null;
 let vPlate=null, vImg=null, vShowOv=true, vMode='nav';
-let vImgData=null; // cached pixel data for current viewer image
-
-// Calibration state — set by click-to-calibrate
-const calib={
-  done: false,
-  samples: [],        // array of {r,g,b} from clicked pixels (up to ~9 from flood fill centroid ring)
-  meanR:0, meanG:0, meanB:0,  // mean of sampled pixels
-  stdR:0, stdG:0, stdB:0,     // spread
-  colonyRadiusPct: 1.0,        // colony radius as % of image width
-  colonyDiamPct:   2.0,
-};
+let sampledR=30, sampledG=80, sampledB=50, hasSample=false;
 
 function ge(id){return document.getElementById(id);}
 function sv(id,v){ge(id).textContent=v;}
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
-
-// ══════════════════════════════════════════════
-// ADVANCED TOGGLE
-// ══════════════════════════════════════════════
-function toggleAdv(btn){
-  const b=ge('adv-body');
-  b.classList.toggle('open');
-  ge('adv-arrow').textContent=b.classList.contains('open')?'▼':'▶';
-}
+function normStr(s){return(s||'').trim().replace(/\s+/g,' ');}
 
 // ══════════════════════════════════════════════
 // API KEY
@@ -389,133 +330,33 @@ async function testKey(){
 ge('api-key').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
 
 // ══════════════════════════════════════════════
-// CLICK-TO-CALIBRATE  ← the new core feature
-//
-// When user clicks a colony pixel:
-//  1. Read exact pixel color
-//  2. Flood-fill outward to measure blob size (stops when color diverges)
-//  3. Compute mean + std of all blob pixels
-//  4. Set tolerance = 2× std (minimum 20)
-//  5. Set colony diameter from blob radius
-//  6. Update UI + sliders
+// COLOR SAMPLE STATE
 // ══════════════════════════════════════════════
-function calibrateFromClick(px, py, imgW, imgH){
-  if(!vImgData) return;
-  const data = vImgData.data;
-
-  // 1. Seed pixel
-  const idx = (Math.round(py)*imgW + Math.round(px))*4;
-  const seedR = data[idx], seedG = data[idx+1], seedB = data[idx+2];
-
-  // 2. Flood fill with BFS — expand while pixels are "similar" to seed
-  // Tolerance for fill: generous (60) so we capture the whole colony blob
-  const FILL_TOL = 60;
-  const visited = new Uint8Array(imgW*imgH);
-  const queue = [{x:Math.round(px), y:Math.round(py)}];
-  visited[Math.round(py)*imgW+Math.round(px)] = 1;
-  const blobPixels = [];
-
-  let minX=imgW,maxX=0,minY=imgH,maxY=0;
-
-  while(queue.length && blobPixels.length < 8000){
-    const {x,y} = queue.shift();
-    const i=(y*imgW+x)*4;
-    const r=data[i],g=data[i+1],b=data[i+2];
-    const dist=Math.sqrt((r-seedR)**2+(g-seedG)**2+(b-seedB)**2);
-    if(dist > FILL_TOL) continue;
-
-    blobPixels.push({r,g,b,x,y});
-    if(x<minX)minX=x; if(x>maxX)maxX=x;
-    if(y<minY)minY=y; if(y>maxY)maxY=y;
-
-    for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){
-      const nx=x+dx,ny=y+dy;
-      if(nx>=0&&ny>=0&&nx<imgW&&ny<imgH&&!visited[ny*imgW+nx]){
-        visited[ny*imgW+nx]=1;
-        queue.push({x:nx,y:ny});
-      }
-    }
-  }
-
-  if(!blobPixels.length) return;
-
-  // 3. Compute mean + std of blob pixel colors
-  let sumR=0,sumG=0,sumB=0;
-  blobPixels.forEach(p=>{sumR+=p.r;sumG+=p.g;sumB+=p.b;});
-  const n=blobPixels.length;
-  const mR=sumR/n, mG=sumG/n, mB=sumB/n;
-
-  let vR=0,vG=0,vB=0;
-  blobPixels.forEach(p=>{vR+=(p.r-mR)**2;vG+=(p.g-mG)**2;vB+=(p.b-mB)**2;});
-  const sR=Math.sqrt(vR/n),sG=Math.sqrt(vG/n),sB=Math.sqrt(vB/n);
-  const colorStd=Math.sqrt(sR*sR+sG*sG+sB*sB);
-
-  // 4. Colony size from bounding box
-  const blobW=maxX-minX+1, blobH=maxY-minY+1;
-  const blobDiam=Math.max(blobW,blobH);
-  const radiusPct=(blobDiam/2)/imgW*100;
-  const diamPct=blobDiam/imgW*100;
-
-  // 5. Tolerance: 2× std, clamped
-  const tol=Math.max(20, Math.min(90, Math.round(colorStd*2.2 + 15)));
-
-  // 6. Store calibration
-  calib.done=true;
-  calib.meanR=Math.round(mR); calib.meanG=Math.round(mG); calib.meanB=Math.round(mB);
-  calib.stdR=sR; calib.stdG=sG; calib.stdB=sB;
-  calib.colonyRadiusPct=Math.max(0.1, radiusPct);
-  calib.colonyDiamPct=Math.max(0.2, diamPct);
-  calib.blobPixelCount=n;
-  calib.tol=tol;
-
-  // 7. Push to sliders
-  ge('sl-tol').value=tol; sv('vtol',tol);
-  const diamSliderVal=Math.min(8, Math.max(0.1, +diamPct.toFixed(2)));
-  ge('sl-merge').value=diamSliderVal; sv('vmerge',diamSliderVal.toFixed(2));
-  // Max blob = 5× calibrated colony area (generous but filters big algal patches)
-  ge('sl-circ').value=0.45; sv('vcirc',0.45);
-
-  // 8. Update calibration panel
-  updateCalibPanel(seedR,seedG,seedB,mR,mG,mB,n,blobDiam,imgW,tol);
-
-  // 9. Update viewer swatch strip
-  updateVCalStrip();
-
-  return {mR,mG,mB,tol,diamPct};
+function setSampledColor(r,g,b){
+  sampledR=r;sampledG=g;sampledB=b;hasSample=true;
+  const hex=`#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  ge('color-swatch').style.background=hex;
+  ge('v-swatch').style.background=hex;
+  ge('swatch-info').innerHTML=`<strong>Sampled colony color:</strong> RGB(${r},${g},${b}) — ${hex}<br>Tolerance: ±<span id="tol-live">${ge('sl-tol').value}</span>. Adjust sliders then ↻ Re-detect.`;
+  ge('sl-tol').addEventListener('input',()=>{const t=ge('tol-live');if(t)t.textContent=ge('sl-tol').value;});
 }
 
-function updateCalibPanel(seedR,seedG,seedB,mR,mG,mB,n,blobDiam,imgW,tol){
-  const panel=ge('calib-panel');
-  panel.classList.add('done');
-  const hex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
-  const seedHex=hex(seedR,seedG,seedB);
-  const meanHex=hex(mR,mG,mB);
-  const diamPct=(blobDiam/imgW*100).toFixed(2);
-
-  panel.innerHTML=`
-    <div class="calib-title">✓ Calibrated from colony click</div>
-    <div class="calib-body">Detection is set to find colonies matching the sampled color and size.<br>
-    Click <strong>↻ Re-detect</strong> in the viewer, or <strong>Detect Colonies →</strong> to run on all plates.</div>
-    <div class="calib-swatches">
-      <div title="Clicked pixel" style="background:${seedHex};width:28px;height:28px;border-radius:4px;border:2px solid var(--border)"></div>
-      <div title="Colony mean color" style="background:${meanHex};width:28px;height:28px;border-radius:4px;border:2px solid var(--border)"></div>
-      <div class="calib-tag">
-        Clicked: <strong>${seedHex}</strong> · Mean: <strong>${meanHex}</strong><br>
-        Colony size: <strong>${diamPct}% of image width</strong> · Blob pixels: <strong>${n}</strong><br>
-        Tolerance: <strong>±${tol}</strong> · Circularity filter: <strong>0.45</strong> (rejects streaks &amp; smears)
-      </div>
-    </div>
-    <div style="margin-top:8px;font-size:.58rem;color:var(--muted)">
-      Want to recalibrate? Open any plate and click 🎯 Click a Colony again.
-    </div>`;
+function applyPreset(name,btn){
+  const PRESETS={teal:{r:40,g:85,b:65},black:{r:25,g:30,b:25},bright:{r:50,g:120,b:60}};
+  const p=PRESETS[name];if(!p)return;
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  setSampledColor(p.r,p.g,p.b);
 }
 
-function updateVCalStrip(){
-  const strip=ge('vcal-strip');
-  if(!calib.done){strip.innerHTML='';return;}
-  const hex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
-  strip.innerHTML=`<div class="vcal-dot" style="background:${hex(calib.meanR,calib.meanG,calib.meanB)}" title="Calibrated colony color"></div>
-    <span style="font-size:.55rem;color:var(--muted)">±${calib.tol}</span>`;
+function getSettings(){
+  return{
+    merge:  +ge('sl-merge').value,
+    tol:    +ge('sl-tol').value,
+    mask:   +ge('sl-mask').value,
+    rim:    +ge('sl-rim').value,
+    sR:sampledR, sG:sampledG, sB:sampledB
+  };
 }
 
 // ══════════════════════════════════════════════
@@ -553,7 +394,9 @@ function addFiles(files){
 function renderQueue(){
   const q=ge('plate-queue');
   if(!plates.length){q.innerHTML='';return;}
-  q.innerHTML=plates.map(p=>`
+  const treatments=[...new Set(plates.map(p=>p.treatment).filter(Boolean))];
+  const dl=`<datalist id="tx-list">${treatments.map(t=>`<option value="${esc(t)}">`).join('')}</datalist>`;
+  q.innerHTML=dl+plates.map(p=>`
     <div class="plate-item ${p.status}" id="pi-${p.id}">
       <div class="plate-row">
         <div class="plate-thumb-wrap" onclick="openViewer('${p.id}')">
@@ -562,8 +405,14 @@ function renderQueue(){
           <div class="zoom-hint">${p.status==='pending'?'🎯':'⛶'}</div>
         </div>
         <div class="plate-fields">
-          <input class="plate-input" style="flex:1.5" placeholder="Treatment (e.g. 3 DNA)" value="${esc(p.treatment)}" oninput="upPlate('${p.id}','treatment',this.value)">
-          <input class="plate-input" style="flex:.8;min-width:70px" placeholder="Replicate" value="${esc(p.replicate)}" oninput="upPlate('${p.id}','replicate',this.value)">
+          <input class="plate-input" list="tx-list" style="flex:1.5" placeholder="Treatment (e.g. DNA)"
+            value="${esc(p.treatment)}"
+            oninput="upPlate('${p.id}','treatment',this.value)"
+            onblur="normPlate('${p.id}','treatment',this)">
+          <input class="plate-input" style="flex:.8;min-width:70px" placeholder="Replicate"
+            value="${esc(p.replicate)}"
+            oninput="upPlate('${p.id}','replicate',this.value)"
+            onblur="normPlate('${p.id}','replicate',this)">
         </div>
         <div class="plate-count-block">
           ${p.status==='done'?`
@@ -577,7 +426,7 @@ function renderQueue(){
         <button class="plate-remove" onclick="removePlate('${p.id}')">✕</button>
       </div>
       ${p.status==='pending'?`<div class="plate-detail">
-        <button class="view-link" onclick="openViewer('${p.id}')">🎯 Open to calibrate →</button>
+        <button class="view-link" onclick="openViewer('${p.id}')">🎯 Open to sample & detect →</button>
       </div>`:''}
       ${p.status==='done'?`<div class="plate-detail">
         <span>Treatment: <strong>${esc(p.treatment||'(not set)')}</strong></span>
@@ -590,6 +439,11 @@ function renderQueue(){
 
 function bLabel(s){return{pending:'Pending',analyzing:'Detecting…',done:'Done',error:'Error'}[s]||s;}
 function upPlate(id,k,v){const p=plates.find(x=>x.id===id);if(p)p[k]=v;}
+function normPlate(id,k,input){
+  const p=plates.find(x=>x.id===id);if(!p)return;
+  p[k]=normStr(input.value);input.value=p[k];
+  if(k==='treatment'){updateResults();renderChart();}
+}
 function removePlate(id){plates=plates.filter(x=>x.id!==id);renderQueue();updateBtns();}
 function updateBtns(){
   ge('detect-btn').disabled=!plates.length;
@@ -626,58 +480,41 @@ function drawMini(plate){
 }
 
 // ══════════════════════════════════════════════
-// DETECTION ENGINE
-// Uses calibrated color + size if available, else falls back to sliders
+// DETECTION ENGINE — exact v23
+// Color-distance from sampled colony color → local maxima → NMS
 // ══════════════════════════════════════════════
-function getSettings(){
-  return{
-    tol:      +ge('sl-tol').value,
-    merge:    +ge('sl-merge').value,
-    mask:     +ge('sl-mask').value,
-    rim:      +ge('sl-rim').value,
-    minPx:    +ge('sl-minpx').value,
-    circ:     +ge('sl-circ').value,
-    sR: calib.done ? calib.meanR : 60,
-    sG: calib.done ? calib.meanG : 90,
-    sB: calib.done ? calib.meanB : 60,
-    expectedBlobPx: calib.done ? calib.blobPixelCount : null,
-    calibDone: calib.done,
-  };
-}
-
 function detectColonies(imgEl, settings){
   return new Promise(resolve=>{
     const W=imgEl.naturalWidth||imgEl.width, H=imgEl.naturalHeight||imgEl.height;
     const cv=document.createElement('canvas');cv.width=W;cv.height=H;
     const ctx=cv.getContext('2d');ctx.drawImage(imgEl,0,0);
+    const {merge,tol,mask,rim,sR,sG,sB}=settings;
     const data=ctx.getImageData(0,0,W,H).data;
 
-    const {tol, merge, mask, rim, sR, sG, sB, circ, expectedBlobPx}=settings;
     const pcx=W/2, pcy=H/2, halfMin=Math.min(W,H)/2;
     const coloniesR=mask>0?halfMin*(mask/100):Infinity;
     const rimR=mask>0?halfMin*((mask+rim)/100):Infinity;
+
     const STEP=2, GW=Math.ceil(W/STEP), GH=Math.ceil(H/STEP);
     const score=new Float32Array(GW*GH);
 
-    // ── Step 1: Score every pixel by color similarity ──
     for(let gy=0;gy<GH;gy++){
       for(let gx=0;gx<GW;gx++){
-        const x=gx*STEP,y=gy*STEP;
+        const x=gx*STEP, y=gy*STEP;
         if(mask>0){
           const dx=x-pcx,dy=y-pcy,d2=dx*dx+dy*dy;
           if(d2>rimR*rimR||d2>coloniesR*coloniesR){score[gy*GW+gx]=0;continue;}
         }
         const i=(y*W+x)*4;
         const r=data[i],g=data[i+1],b=data[i+2];
+        if(r>160&&g>140&&b<110){score[gy*GW+gx]=0;continue;}
         if(r>200&&g>200&&b>185){score[gy*GW+gx]=0;continue;}
         if(r>175&&g>175&&b>175&&Math.abs(r-g)<15&&Math.abs(g-b)<15){score[gy*GW+gx]=0;continue;}
-        if(r>160&&g>140&&b<100){score[gy*GW+gx]=0;continue;}
         const dist=Math.sqrt((r-sR)**2+(g-sG)**2+(b-sB)**2);
         score[gy*GW+gx]=dist<tol?tol-dist:0;
       }
     }
 
-    // ── Step 2: Local maxima ──
     const colonyDiamPx=Math.round((merge/100)*W);
     const supR=Math.max(2,Math.round(colonyDiamPx/STEP/2));
     const peaks=[];
@@ -698,7 +535,6 @@ function detectColonies(imgEl, settings){
     }
     if(!peaks.length){resolve({count:0,colonies:[]});return;}
 
-    // ── Step 3: Greedy NMS ──
     peaks.sort((a,b)=>b.score-a.score);
     const kept=[];
     const minSep2=(colonyDiamPx*0.65)**2;
@@ -711,77 +547,10 @@ function detectColonies(imgEl, settings){
       if(ok)kept.push(p);
     }
 
-    // ── Step 4: Blob shape filter ──
-    // Flood-fill each peak to get its full bounding box + pixel count.
-    // Circularity = 4π·area / perimeter² (1.0 = perfect circle, ~0 = very elongated)
-    // We approximate using bounding box: aspect ratio W/H (or H/W, whichever <1)
-    // A round dot has ratio ≈1.0; a streak has ratio << 1.
-    // Also enforce a max blob size of 8× expected colony area to reject solid patches.
-    const colonyAreaPx = expectedBlobPx
-      ? expectedBlobPx
-      : Math.PI*(colonyDiamPx/2)*(colonyDiamPx/2);
-    const maxBlobPx = colonyAreaPx * 8; // hard ceiling — reject very large patches
-    const minBlobPx = Math.max(2, colonyAreaPx * 0.04);
-
-    const visitedMap = new Int32Array(W*H);
-    let visitGen = 0;
-    const colonies = [];
-
-    for(const p of kept){
-      visitGen++;
-      const blob = floodMeasure(
-        Math.round(p.cx), Math.round(p.cy),
-        data, W, H, sR, sG, sB, tol, visitedMap, visitGen, maxBlobPx
-      );
-
-      // Size gate
-      if(blob.count < minBlobPx) continue;
-      if(blob.count > maxBlobPx) continue;
-
-      // Circularity gate via bounding-box aspect ratio
-      // minRatio = shorter side / longer side → 1.0 = square/circle, 0 = line
-      if(circ > 0){
-        const bw = blob.maxX - blob.minX + 1;
-        const bh = blob.maxY - blob.minY + 1;
-        const ratio = Math.min(bw,bh) / Math.max(bw,bh);
-        if(ratio < circ) continue; // too elongated — it's a streak
-      }
-
-      colonies.push({cx:p.cx,cy:p.cy,area:blob.count,x:p.cx/W*100,y:p.cy/H*100});
-    }
-
-    resolve({count:colonies.length, colonies});
+    const colonyRadPx = colonyDiamPx / 2;
+    const colonies=kept.map(p=>({cx:p.cx,cy:p.cy,area:50,x:p.cx/W*100,y:p.cy/H*100,blobRad:colonyRadPx}));
+    resolve({count:colonies.length,colonies});
   });
-}
-
-// Flood-measure: BFS flood fill that returns pixel count + bounding box.
-// Stops early if count exceeds maxCount (fast rejection).
-function floodMeasure(sx, sy, data, W, H, sR, sG, sB, tol, visited, gen, maxCount){
-  const empty={count:0,minX:sx,maxX:sx,minY:sy,maxY:sy};
-  if(sx<0||sy<0||sx>=W||sy>=H) return empty;
-  const stack=[sy*W+sx];
-  visited[sy*W+sx]=gen;
-  let count=0, minX=sx,maxX=sx,minY=sy,maxY=sy;
-  const tol2=tol*tol;
-  while(stack.length){
-    const idx=stack.pop();
-    const x=idx%W, y=Math.floor(idx/W);
-    const i=idx*4;
-    const r=data[i],g=data[i+1],b=data[i+2];
-    if((r-sR)**2+(g-sG)**2+(b-sB)**2 > tol2) continue;
-    count++;
-    if(count>maxCount) return {count,minX,maxX,minY,maxY}; // early exit
-    if(x<minX)minX=x; if(x>maxX)maxX=x;
-    if(y<minY)minY=y; if(y>maxY)maxY=y;
-    for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){
-      const nx=x+dx,ny=y+dy;
-      if(nx>=0&&ny>=0&&nx<W&&ny<H){
-        const ni=ny*W+nx;
-        if(visited[ni]!==gen){visited[ni]=gen;stack.push(ni);}
-      }
-    }
-  }
-  return{count,minX,maxX,minY,maxY};
 }
 
 // ══════════════════════════════════════════════
@@ -795,11 +564,11 @@ async function readLabel(plate){
       body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:120,
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:plate.mime,data:plate.b64}},
-          {type:'text',text:`Read the yellow sticky note on this petri dish. Return ONLY JSON:\n{"treatment":"<text before last number>","replicate":"<last number>"}\nIf unreadable: {"treatment":"unknown","replicate":""}`}
+          {type:'text',text:`Read the yellow sticky note on this petri dish. It shows a treatment name + replicate number, e.g. "3 DNA 1" = treatment "3 DNA", replicate "1". The LAST number is the replicate. Return ONLY JSON:\n{"treatment":"<text before last number>","replicate":"<last number>"}\nIf unreadable: {"treatment":"unknown","replicate":""}`}
         ]}]})});
     const d=await r.json();if(!r.ok)return{treatment:'',replicate:''};
     const parsed=JSON.parse(d.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim());
-    return{treatment:parsed.treatment||'',replicate:parsed.replicate||''};
+    return{treatment:normStr(parsed.treatment||''),replicate:normStr(parsed.replicate||'')};
   }catch{return{treatment:'',replicate:''};}
 }
 
@@ -816,10 +585,6 @@ ge('clear-btn').addEventListener('click',()=>{
 async function detectAll(){
   const toRun=plates.filter(p=>p.status==='pending'||p.status==='error');
   if(!toRun.length)return;
-  if(!calib.done){
-    ge('progress-text').textContent='⚠ Calibrate first: open a plate → 🎯 Click a Colony.';
-    return;
-  }
   toRun.forEach(p=>{p.status='pending';p.notes='';});
   ge('detect-btn').disabled=true;
   const bar=ge('progress-bar');bar.classList.add('active');
@@ -844,13 +609,12 @@ async function detectAll(){
     renderQueue();if(plate.status==='done')drawMini(plate);
   }
   bar.classList.remove('active');
-  txt.textContent='✓ Done. Open any plate to inspect and correct with ＋ Add / ✕ Remove.';
+  txt.textContent='✓ Done. Open any plate → 🎯 Sample colony → ↻ Re-detect for best accuracy.';
   ge('detect-btn').disabled=false;ge('detect-btn').textContent='↻ Re-analyze Pending';
   showResults();updateBtns();
 }
 
 async function redetectAll(){
-  if(!calib.done){ge('progress-text').textContent='⚠ Calibrate first: open a plate → 🎯 Click a Colony.';return;}
   const settings=getSettings();
   const txt=ge('progress-text'),bar=ge('progress-bar');bar.classList.add('active');
   const fill=ge('progress-fill');
@@ -876,40 +640,26 @@ function updateItemStatus(plate){
 }
 
 // ══════════════════════════════════════════════
-// VIEWER
+// VIEWER — works for both pending and done plates
 // ══════════════════════════════════════════════
 function openViewer(id){
   const p=plates.find(x=>x.id===id);
-  if(!p||p.status==='analyzing')return; // don't open mid-detection
-  vPlate=p;vShowOv=true;
-  // If not calibrated, start in cal mode; else nav
-  vMode = calib.done ? 'nav' : 'cal';
+  if(!p||p.status==='analyzing')return;
+  vPlate=p;vShowOv=true;vMode='nav';
   ge('vtitle').textContent=p.treatment||p.file?.name||'Plate';
   updateVModeUI();
-  updateVCalStrip();
   ge('viewer').classList.add('open');document.body.style.overflow='hidden';
-  loadImg(p.dataUrl).then(img=>{
-    vImg=img;
-    // Cache pixel data
-    const tmpCv=document.createElement('canvas');
-    tmpCv.width=img.naturalWidth;tmpCv.height=img.naturalHeight;
-    const tmpCtx=tmpCv.getContext('2d');tmpCtx.drawImage(img,0,0);
-    vImgData=tmpCtx.getImageData(0,0,img.naturalWidth,img.naturalHeight);
-    redraw();
-  });
-  // Show guided overlay if not calibrated
-  ge('guided-overlay').style.display=calib.done?'none':'flex';
+  loadImg(p.dataUrl).then(img=>{vImg=img;redraw();});
 }
-
 function closeViewer(){
   ge('viewer').classList.remove('open');document.body.style.overflow='';
   if(vPlate&&vPlate.status==='done'){
     vPlate.count=vPlate.colonies.length;
-    renderQueue();drawMini(vPlate);updateResults();renderChart();
+    renderQueue();drawMini(vPlate);showResults();
   } else if(vPlate){
     renderQueue();
   }
-  vPlate=null;vImg=null;vImgData=null;
+  vPlate=null;vImg=null;
 }
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer();});
 
@@ -921,20 +671,14 @@ function toggleOv(){
   redraw();
 }
 function updateVModeUI(){
-  // Reset all buttons
-  ge('btn-cal').className='vbtn'+(vMode==='cal'?' cal-on':'');
-  ge('btn-add').className='vbtn'+(vMode==='add'?' add-on':'');
-  ge('btn-rem').className='vbtn'+(vMode==='rem'?' rem-on':'');
-  ge('btn-nav').className='vbtn'+(vMode==='nav'?' on':'');
-
+  const modes={nav:{id:'btn-nav',cls:'on'},samp:{id:'btn-samp',cls:'samp-on'},add:{id:'btn-add',cls:'add-on'},rem:{id:'btn-rem',cls:'rem-on'}};
+  Object.entries(modes).forEach(([m,{id,cls}])=>{
+    const b=ge(id);b.className='vbtn'+(vMode===m?' '+cls:'');
+  });
   const ind=ge('vmode-ind'),hint=ge('vhint'),vc=ge('vcanvas');
-
-  // Guided overlay: show only in cal mode when not calibrated
-  ge('guided-overlay').style.display=(vMode==='cal'&&!calib.done)?'flex':'none';
-
-  if(vMode==='cal'){
-    ind.className='vmode calibrating';ind.textContent='🎯 CALIBRATE';
-    hint.textContent='Click directly on a typical colony → computer reads its color and size automatically.';
+  if(vMode==='samp'){
+    ind.className='vmode sampling';ind.textContent='🎯 SAMPLE';
+    hint.textContent='Click directly on a typical colony — reads its exact RGB color to calibrate detection.';
     vc.style.cursor='crosshair';
   } else if(vMode==='add'){
     ind.className='vmode adding';ind.textContent='＋ ADD';
@@ -944,40 +688,100 @@ function updateVModeUI(){
     hint.textContent='Click a marker to remove it.';vc.style.cursor='pointer';
   } else {
     ind.className='vmode viewing';ind.textContent='● VIEWING';
-    hint.textContent=calib.done
-      ? 'Calibrated ✓ — click ↻ Re-detect to apply to this plate. Use ＋ Add / ✕ Remove to correct.'
-      : 'Click 🎯 Click a Colony to calibrate detection from your image.';
-    vc.style.cursor='default';
+    hint.textContent='🎯 Sample colony → ↻ Re-detect. Then ＋ Add / ✕ Remove to correct.';vc.style.cursor='default';
   }
 }
 
-// ── Canvas click handler ──
 ge('vcanvas').addEventListener('click',function(e){
   if(!vPlate||!vImg)return;
   const cv=this,rect=cv.getBoundingClientRect();
   const sx=cv.width/rect.width,sy=cv.height/rect.height;
   const px=(e.clientX-rect.left)*sx,py=(e.clientY-rect.top)*sy;
 
-  if(vMode==='cal'){
-    // Run calibration
-    const result=calibrateFromClick(px,py,vImg.naturalWidth,vImg.naturalHeight);
-    if(result){
-      // Draw calibration ring on canvas to confirm
-      const ctx=cv.getContext('2d');
-      const R=Math.round(calib.colonyRadiusPct/100*vImg.naturalWidth);
-      ctx.strokeStyle='#ffd166';ctx.lineWidth=3;
-      ctx.beginPath();ctx.arc(px,py,R+4,0,Math.PI*2);ctx.stroke();
-      ctx.strokeStyle='rgba(255,209,102,.4)';ctx.lineWidth=1;
-      ctx.beginPath();ctx.arc(px,py,R*2,0,Math.PI*2);ctx.stroke();
-      ctx.fillStyle='#ffd166';ctx.font='bold 13px "Space Mono",monospace';
-      ctx.textAlign='center';ctx.fillText('✓',px,py+5);
+  if(vMode==='samp'){
+    const tmpCv=document.createElement('canvas');
+    tmpCv.width=vImg.naturalWidth;tmpCv.height=vImg.naturalHeight;
+    const tmpCtx=tmpCv.getContext('2d');tmpCtx.drawImage(vImg,0,0);
+    const imgData=tmpCtx.getImageData(0,0,vImg.naturalWidth,vImg.naturalHeight);
+    const data=imgData.data;
+    const W=vImg.naturalWidth, H=vImg.naturalHeight;
 
-      setVMode('nav');
-      ge('vhint').textContent=`✓ Calibrated! Color: RGB(${calib.meanR},${calib.meanG},${calib.meanB}), size: ${calib.colonyDiamPct.toFixed(2)}% — click ↻ Re-detect now.`;
+    // Read seed pixel color
+    const si=(Math.round(py)*W+Math.round(px))*4;
+    const seedR=data[si],seedG=data[si+1],seedB=data[si+2];
 
-      // Auto-redetect
-      redetectCurrent();
+    // Flood-fill from click to measure actual colony blob
+    // Tight tolerance (30) so we only capture the colony itself, not background
+    const FILL_TOL=30;
+    const visited=new Uint8Array(W*H);
+    const queue=[Math.round(py)*W+Math.round(px)];
+    visited[queue[0]]=1;
+    let minX=W,maxX=0,minY=H,maxY=0,blobCount=0;
+    let sumR=0,sumG=0,sumB=0;
+
+    while(queue.length&&blobCount<30000){
+      const id=queue.shift();
+      const x=id%W,y=Math.floor(id/W);
+      const i=id*4;
+      const r=data[i],g=data[i+1],b=data[i+2];
+      if(Math.sqrt((r-seedR)**2+(g-seedG)**2+(b-seedB)**2)>FILL_TOL)continue;
+      blobCount++;
+      sumR+=r;sumG+=g;sumB+=b;
+      if(x<minX)minX=x;if(x>maxX)maxX=x;
+      if(y<minY)minY=y;if(y>maxY)maxY=y;
+      for(const[dx,dy]of[[-1,0],[1,0],[0,-1],[0,1]]){
+        const nx=x+dx,ny=y+dy;
+        if(nx>=0&&ny>=0&&nx<W&&ny<H){
+          const ni=ny*W+nx;
+          if(!visited[ni]){visited[ni]=1;queue.push(ni);}
+        }
+      }
     }
+
+    // Mean color of blob
+    const mR=blobCount>0?Math.round(sumR/blobCount):seedR;
+    const mG=blobCount>0?Math.round(sumG/blobCount):seedG;
+    const mB=blobCount>0?Math.round(sumB/blobCount):seedB;
+    setSampledColor(mR,mG,mB);
+
+    // Colony diameter from bounding box, auto-set slider with 40% margin
+    const blobDiam=Math.max(maxX-minX+1,maxY-minY+1);
+    const diamWithMargin=blobDiam*1.4;
+    const diamPct=Math.min(8,Math.max(0.2,+(diamWithMargin/W*100).toFixed(2)));
+    ge('sl-merge').value=diamPct;
+    sv('vmerge',diamPct.toFixed(2));
+
+    // Auto-set marker display size to match the colony radius scaled to display size
+    const displayScale=cv.getBoundingClientRect().width/W;
+    const markerR=Math.max(3,Math.min(28,Math.round(measuredRad*displayScale)));
+    ge('msize').value=markerR; sv('msval',markerR);
+
+    // Draw confirmation circle — scale to display size
+    // px/py are already in full-res canvas coords, but the ring size needs to match visually
+    const measuredRad=blobDiam/2;
+    setVMode('nav');
+    ge('vhint').textContent=`✓ Sampled: color RGB(${mR},${mG},${mB}), diameter ~${Math.round(blobDiam)}px (${diamPct.toFixed(1)}% of image). Detecting…`;
+    const ctx=cv.getContext('2d');
+    // Ring drawn in full-res canvas coords — correct size
+    const lineW=Math.max(3, measuredRad*0.1);
+    // Solid ring = exact measured colony size
+    ctx.strokeStyle='#ffd166';ctx.lineWidth=lineW;
+    ctx.beginPath();ctx.arc(px,py,measuredRad,0,Math.PI*2);ctx.stroke();
+    // Dashed outer ring = 40% margin zone
+    ctx.setLineDash([measuredRad*0.3, measuredRad*0.2]);
+    ctx.strokeStyle='rgba(255,209,102,0.55)';ctx.lineWidth=Math.max(2,lineW*0.7);
+    ctx.beginPath();ctx.arc(px,py,measuredRad*1.4,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+    // Checkmark in center, scaled to colony size
+    ctx.fillStyle='#ffd166';
+    ctx.font=`bold ${Math.max(14,Math.round(measuredRad*0.9))}px "Space Mono",monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('✓',px,py);
+    // Place a marker on the sampled colony — stores the measured radius so redraw shows it correctly
+    vPlate.colonies=[{cx:Math.round(px),cy:Math.round(py),area:50,x:px/W*100,y:py/H*100,manual:true,sampled:true,sampledRad:measuredRad}];
+    vPlate.count=1;
+    updateVBadge();
+    redraw();
+    ge('vhint').textContent=`✓ Sampled: RGB(${mR},${mG},${mB}), diameter ~${Math.round(blobDiam)}px. Now click ↻ Re-detect to find the rest.`;
     return;
   }
 
@@ -1004,14 +808,13 @@ function updateVBadge(){if(vPlate)ge('vbadge').textContent=vPlate.colonies.lengt
 
 async function redetectCurrent(){
   if(!vPlate||!vImg)return;
-  if(!calib.done){ge('vhint').textContent='⚠ Click 🎯 Click a Colony first to calibrate.';setVMode('cal');return;}
-  ge('vhint').textContent='Detecting…';
+  ge('vhint').textContent='Re-detecting…';
   const det=await detectColonies(vImg,getSettings());
   vPlate.colonies=det.colonies;vPlate.count=det.count;
-  vPlate.status='done'; // mark done so it shows count
+  vPlate.status='done';
   updateVBadge();redraw();drawMini(vPlate);
   updateItemStatus(vPlate);showResults();updateBtns();
-  ge('vhint').textContent=`${det.count} colonies found. Use ＋ Add / ✕ Remove to correct, or 🎯 Click a Colony to recalibrate.`;
+  ge('vhint').textContent=`${det.count} colonies found. Adjust settings or use ＋/✕ to correct.`;
 }
 
 function redraw(){
@@ -1020,18 +823,34 @@ function redraw(){
   cv.width=vImg.naturalWidth;cv.height=vImg.naturalHeight;
   const ctx=cv.getContext('2d');ctx.drawImage(vImg,0,0);
   updateVBadge();
-  if(!vShowOv||!vPlate.colonies.length)return;
+  if(!vShowOv||!vPlate.colonies||!vPlate.colonies.length)return;
   const W=cv.width,H=cv.height;
   const r=parseInt(ge('msize').value)||7;
   const fs=Math.max(7,r+2);
   vPlate.colonies.forEach((c,i)=>{
     const cx=(c.x/100)*W,cy=(c.y/100)*H;
-    const color=c.manual?'#ff9f43':'#4dff91';
-    const fill=c.manual?'rgba(255,159,67,.2)':'rgba(77,255,145,.15)';
-    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    // Use stored blob radius if available, else fall back to msize scaled to image
+    const drawR = c.sampled
+      ? Math.round(c.sampledRad)
+      : c.blobRad
+        ? Math.round(c.blobRad)
+        : Math.max(4, Math.round(W * (+ge('sl-merge').value/100) / 2));
+    const color=c.sampled?'#ffd166':c.manual?'#ff9f43':'#4dff91';
+    const fill=c.sampled?'rgba(255,209,102,.18)':c.manual?'rgba(255,159,67,.2)':'rgba(77,255,145,.15)';
+    ctx.beginPath();ctx.arc(cx,cy,drawR,0,Math.PI*2);
     ctx.fillStyle=fill;ctx.fill();
-    ctx.strokeStyle=color;ctx.lineWidth=Math.max(1,r*.12);ctx.stroke();
-    if(vPlate.colonies.length<=500){
+    ctx.strokeStyle=color;ctx.lineWidth=c.sampled?3:Math.max(2,drawR*.08);ctx.stroke();
+    if(c.sampled){
+      ctx.setLineDash([drawR*0.3,drawR*0.2]);
+      ctx.strokeStyle='rgba(255,209,102,0.4)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(cx,cy,drawR*1.4,0,Math.PI*2);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font=`bold ${Math.max(12,Math.round(drawR*0.7))}px "Space Mono",monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillText('🎯',cx+1,cy+1);
+      ctx.fillStyle='#ffd166';ctx.fillText('🎯',cx,cy);
+    } else if(vPlate.colonies.length<=500){
+      const fs=Math.max(8,Math.round(drawR*0.8));
       ctx.font=`bold ${fs}px "Space Mono",monospace`;
       ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillStyle='rgba(0,10,3,.8)';ctx.fillText(i+1,cx+.5,cy+.5);
@@ -1052,7 +871,7 @@ function redraw(){
 }
 
 // ══════════════════════════════════════════════
-// RESULTS + CHART
+// RESULTS + CHART (Mean ± SD)
 // ══════════════════════════════════════════════
 function showResults(){
   const done=plates.filter(p=>p.status==='done');if(!done.length)return;
@@ -1065,7 +884,7 @@ function showResults(){
 function updateResults(){
   const done=plates.filter(p=>p.status==='done');
   ge('s-plates').textContent=done.length;
-  ge('s-treatments').textContent=[...new Set(done.map(p=>p.treatment||'Unnamed'))].length;
+  ge('s-treatments').textContent=[...new Set(done.map(p=>normStr(p.treatment)||'Unnamed'))].length;
   ge('s-total').textContent=done.reduce((s,p)=>s+(p.count||0),0);
   ge('results-tbody').innerHTML=done.map((p,i)=>`
     <tr>
@@ -1080,7 +899,7 @@ function updateResults(){
 function renderChart(){
   const done=plates.filter(p=>p.status==='done');if(!done.length)return;
   const groups={};
-  done.forEach(p=>{const t=p.treatment||'Unnamed';if(!groups[t])groups[t]=[];groups[t].push(p.count||0);});
+  done.forEach(p=>{const t=normStr(p.treatment)||'Unnamed';if(!groups[t])groups[t]=[];groups[t].push(p.count||0);});
   const labels=Object.keys(groups);
   const means=labels.map(t=>{const v=groups[t];return v.reduce((a,b)=>a+b,0)/v.length;});
   const sds=labels.map((t,i)=>{
@@ -1135,9 +954,9 @@ function renderChart(){
 function exportExcel(){
   const done=plates.filter(p=>p.status==='done');if(!done.length)return;
   const raw=[['Treatment','Replicate','Colony Count']];
-  done.forEach(p=>raw.push([p.treatment||'',p.replicate||'',p.count]));
+  done.forEach(p=>raw.push([normStr(p.treatment)||'',normStr(p.replicate)||'',p.count]));
   const groups={};
-  done.forEach(p=>{const t=p.treatment||'Unnamed';if(!groups[t])groups[t]=[];groups[t].push(p.count||0);});
+  done.forEach(p=>{const t=normStr(p.treatment)||'Unnamed';if(!groups[t])groups[t]=[];groups[t].push(p.count||0);});
   const sum=[['Treatment','N (replicates)','Mean','SD','Min','Max']];
   Object.entries(groups).forEach(([t,v])=>{
     const m=v.reduce((a,b)=>a+b,0)/v.length;
